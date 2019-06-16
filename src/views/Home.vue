@@ -1,5 +1,5 @@
 <template>
-  <div class="home">HOME PAGE TEST</div>
+  <div class="home-display isdesktop ismobile">HOME PAGE TEST</div>
 </template>
 
 <script>
@@ -12,3 +12,9 @@ export default {
   }
 };
 </script>
+<style scoped>
+.home-display {
+  width: 1200px;
+}
+</style>
+

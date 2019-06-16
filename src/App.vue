@@ -19,9 +19,15 @@ export default {
 #app {
   margin: 0;
   padding: 0;
+  font-family: "Kanit", sans-serif;
 }
 .main-app {
   margin: 0;
   padding: 0;
+  font-family: "Kanit", sans-serif;
+}
+a,
+a:hover {
+  text-decoration: none !important;
 }
 </style>

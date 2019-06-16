@@ -2,9 +2,6 @@
   <div class="topbar-div">
     <div>
       <p>USERNAME</p>
-      <select>
-        <option>Profile</option>
-      </select>
     </div>
   </div>
 </template>

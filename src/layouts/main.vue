@@ -1,7 +1,6 @@
 <template>
   <div class="main-layout-display" style="margin: 0px; padding: 0px;">
-    <sidebar style="grid-row: span 2;"/>
-    <topbar/>
+    <sidebar/>
     <slot/>
   </div>
 </template>
@@ -22,6 +21,29 @@ export default {
 .main-layout-display {
   display: grid;
   grid-template-columns: 200px calc(100vw - 200px);
-  grid-template-rows: 50px calc(100vh - 50px);
+}
+@media screen and (min-width: 1024px) {
+  .isdesktop {
+    margin: 20px;
+  }
+}
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+li,
+ul {
+  margin: 0;
+  padding: 0;
+}
+.box {
+  background-color: #ffffff;
+  border: solid #e6e6e6;
+  border-width: 1px;
+  border-radius: 6px;
+  padding: 20px;
 }
 </style>
