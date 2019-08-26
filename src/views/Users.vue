@@ -23,6 +23,7 @@
         </td>
       </tr>
     </table>
+    <p style="color: red;" v-if="errorMessage">{{ errorMessage }}</p>
     <div v-if="userIndex >= 0">
       Edit
       <div>
@@ -79,7 +80,8 @@ export default {
       name: '',
       isPassword: false,
       password: '',
-      admin: false
+      admin: false,
+      errorMessage: ''
     }
   },
   created () {
@@ -118,6 +120,7 @@ export default {
       }
     },
     saveUser (index = -1) {
+      this.errorMessage = ''
       let url = '/admin/user'
       const data = {
         username: this.username,
@@ -146,8 +149,8 @@ export default {
         }
         this.clearUser()
       }).catch((error) => {
-        if (error.response && error.response.data) console.error('save user', error.response.data.error)
-        else console.error('save user', error.message)
+        if (error.response && error.response.data) this.errorMessage = error.response.data.error
+        else this.errorMessage = error.message
       })
     },
     deleteUser (index) {
