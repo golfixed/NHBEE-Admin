@@ -39,6 +39,15 @@ const router = new Router({
       component: () => import('./views/Survey.vue')
     },
     {
+      path: '/users',
+      name: 'users',
+      meta: {
+        requiresAuth: true,
+        requiresAdmin: true
+      },
+      component: () => import('./views/Users.vue')
+    },
+    {
       path: '*',
       redirect: '/'
     }

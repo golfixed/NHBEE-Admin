@@ -15,6 +15,7 @@
         <sidebaritem linkto="/post" icon="fas fa-quote-right" label="โพสต์"/>
         <sidebaritem linkto="/library" icon="fas fa-images" label="คลัง"/>
         <sidebaritem linkto="/survey" icon="fas fa-poll-h" label="แบบสอบถาม"/>
+        <sidebaritem v-if="isAdmin" linkto="/users" icon="fas fa-user" label="จัดการผู้ใช้"/>
       </div>
       <div class="signout-div" @click="logout">
         <i class="fas fa-sign-out-alt signout-btn-icon"></i>
@@ -32,6 +33,11 @@ export default {
   name: "sidebar",
   components: {
     sidebaritem
+  },
+  computed: {
+    isAdmin () {
+      return this.$store.getters.isAdmin
+    }
   },
   methods: {
     logout () {

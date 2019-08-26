@@ -80,7 +80,7 @@ const store = new Vuex.Store({
   },
   getters: {
     isLoggedIn: state => !!state.token,
-    isRefresh: state => state.refreshing,
+    isAdmin: (state, getters) => getters.payload.admin || false,
     payload: state => {
       if (state.token) {
         try {
