@@ -16,7 +16,7 @@
         <sidebaritem linkto="/library" icon="fas fa-images" label="คลัง"/>
         <sidebaritem linkto="/survey" icon="fas fa-poll-h" label="แบบสอบถาม"/>
       </div>
-      <div class="signout-div">
+      <div class="signout-div" @click="logout">
         <i class="fas fa-sign-out-alt signout-btn-icon"></i>
         <p>ออกจากระบบ</p>
       </div>
@@ -25,11 +25,21 @@
 </template>
 
 <script>
-import sidebaritem from "@/components/sidebaritem.vue";
+import sidebaritem from "@/components/sidebaritem.vue"
+import layout_login from '@/layouts/login.vue'
+
 export default {
   name: "sidebar",
   components: {
     sidebaritem
+  },
+  methods: {
+    logout () {
+      this.$store.dispatch('logout').then(() => {
+        if (this.$route.path !== '/') this.$router.push('/')
+        else this.$emit(`update:layout`, layout_login)
+      })
+    }
   }
 };
 </script>
@@ -84,6 +94,7 @@ export default {
   border: solid #ffffff47;
   border-width: 1px 0 0 0;
   margin: 0 20px;
+  cursor: pointer;
 }
 .signout-btn-icon {
   font-size: 20px;
