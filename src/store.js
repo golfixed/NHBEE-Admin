@@ -96,9 +96,15 @@ const store = new Vuex.Store({
         const exp = new Date((getters.payload.exp || 0) * 1000)
         const now = new Date()
         const expire_in = (exp.getTime() - now.getTime()) / 1000
-        if (expire_in < 1800) store.dispatch('refresh')
-        else if (expire_in < 0) store.dispatch('logout')
-        else console.log('token in time')
+        if (expire_in < 1800 && expire_in > 0) {
+          store.dispatch('refresh')
+          return true
+        } else if (expire_in <= 0) {
+          store.dispatch('logout')
+          return false
+        } else {
+          return true
+        }
       }
     },
     forceRefresh: (state) => () => {

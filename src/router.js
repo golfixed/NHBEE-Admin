@@ -63,7 +63,9 @@ router.beforeEach((to, from, next) => {
   if (requiresAdmin === true) {
     if (store.getters.payload.admin !== true) return next('/')
   }
-  if (store.getters.isLoggedIn) store.getters.checkToken()
+  if (store.getters.isLoggedIn) {
+    if (!store.getters.checkToken()) return next('/')
+  }
   return next()
 })
 
