@@ -5,11 +5,11 @@
         <p class="section-title">ค้นหาโพสต์</p>
         <div class="form-set">
           <p class="form-set-label">ค้นหาด้วยชื่อ</p>
-          <input v-model="search" class="form-set-input" type="text" @keypress.enter="getNews">
+          <input v-model="search" class="form-set-input" type="text" @keypress.enter="getNews" />
         </div>
         <div class="form-set">
           <p class="form-set-label">ประเภท</p>
-          <input class="form-set-input" type="type">
+          <input class="form-set-input" type="type" />
         </div>
       </div>
       <div>
@@ -27,66 +27,75 @@
               <td>{{ news.title_th }} ({{ news.title_en }})</td>
               <td>
                 <button @click="editNews(news.id)">
-                  <i class="fas fa-edit"/>
+                  <i class="fas fa-edit" />
                 </button>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
-      <div v-if="newsData">
-        {{ newsData }}
-      </div>
+      <div v-if="newsData">{{ newsData }}</div>
     </div>
   </div>
 </template>
 
 <script>
-import axios from '@/axios.js'
-
+import axios from "@/axios.js";
+import layout_default from "@/layouts/main.vue";
 export default {
-  name: 'post',
-  data () {
+  name: "post",
+  data() {
     return {
       dataList: [],
       newsData: null,
       isLoading: false,
-      search: '',
+      search: "",
       page: 1,
       limit: 6
-    }
+    };
   },
-  created () {
-    this.getNews()
+  created() {
+    this.getNews();
+    this.$emit(`update:layout`, layout_default);
   },
   methods: {
-    getNews () {
-      if (this.isLoading) return ''
-      this.isLoading = true
-      axios(`/admin/news?limit=${this.limit}&page=${this.page}&q=${this.search}`).then((response) => {
-        const data = response.data
-        this.dataList = data.news.data
-      }).catch((error) => {
-        if (error.response && error.response.data) console.error('get news', error.response.data.error)
-        else console.error('get news', error.message)
-      }).finally(() => {
-        this.isLoading = false
-      })
+    getNews() {
+      if (this.isLoading) return "";
+      this.isLoading = true;
+      axios(
+        `/admin/news?limit=${this.limit}&page=${this.page}&q=${this.search}`
+      )
+        .then(response => {
+          const data = response.data;
+          this.dataList = data.news.data;
+        })
+        .catch(error => {
+          if (error.response && error.response.data)
+            console.error("get news", error.response.data.error);
+          else console.error("get news", error.message);
+        })
+        .finally(() => {
+          this.isLoading = false;
+        });
     },
-    editNews (id) {
-      if (this.isLoading) return ''
-      this.isLoading = true
-      axios(`/admin/news/${id}`).then((response) => {
-        this.newsData = response.data
-      }).catch((error) => {
-        if (error.response && error.response.data) console.error('get news', error.response.data.error)
-        else console.error('get news', error.message)
-      }).finally(() => {
-        this.isLoading = false
-      })
+    editNews(id) {
+      if (this.isLoading) return "";
+      this.isLoading = true;
+      axios(`/admin/news/${id}`)
+        .then(response => {
+          this.newsData = response.data;
+        })
+        .catch(error => {
+          if (error.response && error.response.data)
+            console.error("get news", error.response.data.error);
+          else console.error("get news", error.message);
+        })
+        .finally(() => {
+          this.isLoading = false;
+        });
     }
   }
-}
+};
 </script>
 
 <style>
