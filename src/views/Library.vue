@@ -26,16 +26,21 @@
       <div v-if="current_tab === 'image'">
         <h1 class="tab-headtext">คลังรูปภาพ</h1>
         <div class="toolbar">
-          <div class="toolbar-button">
+          <div>
+            <input ref="picture_input" type="file" @change="fileChange" accept="image/jpeg,image/png" :disabled="isUploading"/>
+            <br/>
+            <input type="text" v-model="filename" :disabled="isUploading"/>
+          </div>
+          <button class="toolbar-button" :disabled="!file || isUploading" @click="uploadFile('picture')">
             <span>อัปโหลดรูปภาพ</span>
             <i class="fas fa-file-import toolbar-btn-icon"></i>
-          </div>
+          </button>
         </div>
         <div class="image-show-area">
           <div class="image-item" v-for="(data, i) in imageList" :key="i">
             <img class="image-item-img" :src="data.pictureURL" />
             <h5 class="image-item-filename">{{data.filename}}</h5>
-            <button class="image-delete-btn">
+            <button class="image-delete-btn" @click="deleteImage(i)">
               <i class="fas fa-trash-alt"></i>
             </button>
           </div>
@@ -44,10 +49,15 @@
       <div v-if="current_tab === 'pdf'">
         <h1 class="tab-headtext">คลังเอกสาร</h1>
         <div class="toolbar">
-          <div class="toolbar-button">
+          <div>
+            <input ref="pdf_input" type="file" @change="fileChange" accept="application/pdf" :disabled="isUploading"/>
+            <br/>
+            <input type="text" v-model="filename" :disabled="isUploading"/>
+          </div>
+          <button class="toolbar-button" :disabled="!file || isUploading" @click="uploadFile('pdf')">
             <span>อัปโหลดเอกสาร</span>
             <i class="fas fa-file-import toolbar-btn-icon"></i>
-          </div>
+          </button>
         </div>
         <div class="doc-show-area">
           <div class="doc-table-header">
@@ -58,7 +68,7 @@
             <i class="far fa-file-pdf doc-item-icon"></i>
             <h5 class="doc-item-filename">{{data.filename}}</h5>
             <h5 class="doc-item-date">{{data.date}}</h5>
-            <button class="doc-delete-btn">
+            <button class="doc-delete-btn" @click="deletePdf(i)">
               <i class="fas fa-trash-alt"></i>
             </button>
           </div>
@@ -70,6 +80,7 @@
 
 <script>
 import layout_default from "@/layouts/main.vue";
+import axios from '@/axios.js';
 export default {
   name: "library",
   created() {
@@ -79,50 +90,131 @@ export default {
     return {
       current_tab: "image",
       imageList: [
-        {
-          filename: "bee.jpg",
-          pictureURL: "https://placeimg.com/320/200/any"
-        },
-        {
-          filename: "people.jpg",
-          pictureURL: "https://placeimg.com/320/200/nature"
-        },
-        {
-          filename: "shocked.jpg",
-          pictureURL: "https://placeimg.com/320/200/animals"
-        },
-        {
-          filename: "bee.jpg",
-          pictureURL: "https://placeimg.com/360/640/tech"
-        },
-        {
-          filename: "people.jpg",
-          pictureURL: "https://placeimg.com/320/200/nature"
-        },
-        {
-          filename: "shocked.jpg",
-          pictureURL: "https://placeimg.com/320/200/people"
-        }
+        // {
+        //   filename: "bee.jpg",
+        //   pictureURL: "https://placeimg.com/320/200/any"
+        // },
+        // {
+        //   filename: "people.jpg",
+        //   pictureURL: "https://placeimg.com/320/200/nature"
+        // },
+        // {
+        //   filename: "shocked.jpg",
+        //   pictureURL: "https://placeimg.com/320/200/animals"
+        // },
+        // {
+        //   filename: "bee.jpg",
+        //   pictureURL: "https://placeimg.com/360/640/tech"
+        // },
+        // {
+        //   filename: "people.jpg",
+        //   pictureURL: "https://placeimg.com/320/200/nature"
+        // },
+        // {
+        //   filename: "shocked.jpg",
+        //   pictureURL: "https://placeimg.com/320/200/people"
+        // }
       ],
       documentList: [
-        {
-          filename: "newest.pdf",
-          date: "2019-02-12"
-        },
-        {
-          filename: "newer.pdf",
-          date: "2018-09-12"
-        },
-        {
-          filename: "neweee.pdf",
-          date: "2019-01-15"
-        }
-      ]
+        // {
+        //   filename: "newest.pdf",
+        //   date: "2019-02-12"
+        // },
+        // {
+        //   filename: "newer.pdf",
+        //   date: "2018-09-12"
+        // },
+        // {
+        //   filename: "neweee.pdf",
+        //   date: "2019-01-15"
+        // }
+      ],
+      page: {
+        now: 1,
+        all: 0
+      },
+      filename: '',
+      file: null,
+      isUploading: false
     };
+  },
+  created () {
+    this.loadFileList(this.current_tab);
   },
   methods: {
     switchTab: function(target) {
       this.current_tab = target;
+      this.loadFileList(target);
+    },
+    loadFileList (target, page = 1) {
+      if (target === 'pdf' || target === 'image') {
+        axios(`/admin/${target === 'image' ? 'picture' : 'pdf'}?page=${page}`).then(response => {
+          this.page = response.data.page
+          if (target === 'pdf') this.documentList = response.data.file.data
+          else this.imageList = response.data.file.data
+        }).catch(error => {
+          if (error.response && error.response.data)
+            console.error("get file list", error.response.data.error);
+          else console.error("get file list", error.message);
+        });
+      }
+    },
+    uploadFile (target) {
+      if (this.isUploading) return "";
+      if (target !== 'pdf' && target !== 'picture') return "";
+      this.isUploading = true;
+      const formData = new FormData();
+      formData.append(target, this.file);
+      formData.append('name', this.filename);
+      axios.post(`/admin/${target}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      }).then(response => {
+        console.log('file id', response.data.id);
+        this.filename = '';
+        this.file = null;
+        if (target === 'picture') {
+          this.imageList.push(response.data)
+          this.$refs.picture_input.value = "";
+        } else {
+          this.documentList.push(response.data)
+          this.$refs.pdf_input.value = "";
+        }
+      }).catch(error => {
+        if (error.response && error.response.data)
+          console.error("upload file", error.response.data.error);
+        else console.error("upload file", error.message);
+      }).finally(() => {
+        this.isUploading = false;
+      });
+    },
+    deleteImage (index) {
+      const image = this.imageList[index];
+      if (confirm(`ยืนยันว่าจะลบรูป ${image.filename}?`)) {
+        axios.delete(`/admin/picture/${image.id}`).then(response => {
+          this.imageList.splice(index, 1);
+        }).catch(error => {
+          if (error.response && error.response.data)
+            console.error("delete image", error.response.data.error);
+          else console.error("delete image", error.message);
+        });
+      }
+    },
+    deletePdf (index) {
+      const pdf = this.documentList[index];
+      if (confirm(`ยืนยันว่าจะลบเอกสาร ${pdf.filename}?`)) {
+        axios.delete(`/admin/pdf/${pdf.id}`).then(response => {
+          this.documentList.splice(index, 1);
+        }).catch(error => {
+          if (error.response && error.response.data)
+            console.error("delete pdf", error.response.data.error);
+          else console.error("delete pdf", error.message);
+        });
+      }
+    },
+    fileChange (e) {
+      const file = e.target.files[0]
+      this.filename = file.name
+      this.file = file
     }
   }
 };
