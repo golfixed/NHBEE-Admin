@@ -1,15 +1,18 @@
 <template>
   <div class="isdesktop">
-    <div class="box">
+    <h1 class="tab-headtext" style="margin-bottom: 20px;">โพสต์ - บทความ</h1>
+    <div class="toolbar">
+      <div class="toolbar-button" @click="newPostOpen();">
+        <span>บทความใหม่</span>
+        <i class="fas fa-edit toolbar-btn-icon"></i>
+      </div>
+    </div>
+    <div class="post-view">
       <div class="searchbox-div">
         <p class="section-title">ค้นหาโพสต์</p>
         <div class="form-set">
           <p class="form-set-label">ค้นหาด้วยชื่อ</p>
           <input v-model="search" class="form-set-input" type="text" @keypress.enter="getNews" />
-        </div>
-        <div class="form-set">
-          <p class="form-set-label">ประเภท</p>
-          <input class="form-set-input" type="type" />
         </div>
       </div>
       <div>
@@ -36,14 +39,24 @@
       </div>
       <div v-if="newsData">{{ newsData }}</div>
     </div>
+    <div class="newpost-box-bg" v-if="isOpenNewPost === true">
+      <div class="newpost-window">
+        <newpost :newPostClose="newPostClose" />
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import axios from "@/axios.js";
 import layout_default from "@/layouts/main.vue";
+import newpost from "@/components/newpost.vue";
+
 export default {
   name: "post",
+  components: {
+    newpost
+  },
   data() {
     return {
       dataList: [],
@@ -51,7 +64,8 @@ export default {
       isLoading: false,
       search: "",
       page: 1,
-      limit: 6
+      limit: 6,
+      isOpenNewPost: false
     };
   },
   created() {
@@ -93,12 +107,45 @@ export default {
         .finally(() => {
           this.isLoading = false;
         });
+    },
+    newPostOpen: function() {
+      this.isOpenNewPost = true;
+    },
+    newPostClose: function() {
+      this.isOpenNewPost = false;
     }
   }
 };
 </script>
 
 <style>
+.newpost-box-bg {
+  position: absolute;
+  z-index: 5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #00000075;
+}
+.newpost-window {
+  position: absolute;
+  width: 1000px;
+  height: 630px;
+  background-color: #fff;
+  border-radius: 5px;
+  padding: 20px;
+}
+.post-view {
+  background-color: #ffffff;
+  border: solid grey;
+  border-width: 1px;
+  border-radius: 5px;
+  padding: 20px;
+}
 .section-title {
   font-size: 20px;
 }
@@ -120,5 +167,29 @@ export default {
   min-height: 30px;
   border-radius: 5px;
   border: 1px solid #aaaaaa;
+}
+.toolbar {
+  display: flex;
+  margin-bottom: 20px;
+}
+.toolbar-button {
+  width: fit-content;
+  height: 30px;
+  background-color: #fff;
+  border-radius: 5px;
+  border: 1px solid grey;
+  font-size: 15px;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  transition: all 0.1s;
+}
+.toolbar-button:hover {
+  background-color: rgb(220, 220, 220);
+  transition: all 0.1s;
+  cursor: pointer;
+}
+.toolbar-btn-icon {
+  margin-left: 10px;
 }
 </style>

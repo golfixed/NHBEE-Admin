@@ -232,6 +232,7 @@ export default {
 .tab-item-active {
   border-width: 0 0 3px 0;
   border-color: grey;
+  font-weight: bold;
 }
 .tab-item-inactive {
   border-width: 0;
@@ -259,7 +260,7 @@ export default {
   width: 50%;
 }
 .doc-table-date {
-  margin-left: 20px;
+  margin-left: 30px;
 }
 .image-show-area {
   background-color: #fff;
@@ -338,7 +339,6 @@ export default {
   transition: all 0.1s;
 }
 .doc-item:hover {
-  transform: scale(1.02);
   transition: all 0.1s;
   cursor: pointer;
   -webkit-box-shadow: 0px 2px 5px 1px rgba(0, 0, 0, 0.22);
