@@ -12,6 +12,16 @@ if (token) {
   axios.defaults.headers.common['Authorization'] = 'Bearer ' + token
 }
 
+// ตัวอย่างการใช้ Vue Analytics
+// import VueAnalytics from 'vue-analytics'
+// Vue.use(VueAnalytics, {
+//   id: 'UA-146666158-1', // id นี้คือ NHBEE KMUTT แล้ว
+//   router,
+//   debug: {
+//     sendHitTask: process.env.NODE_ENV === 'production'
+//   }
+// })
+
 new Vue({
   router,
   store,
