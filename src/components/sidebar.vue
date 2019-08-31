@@ -1,21 +1,21 @@
 <template>
   <div class="main-bg display">
     <div class="logo-div">
-      <img src="/img/PNG/logo.png" style="width: 100px;">
+      <img src="/img/PNG/logo.png" style="width: 100px;" />
       <div class="logo-title">
         <p>
           ระบบจัดการ
-          <br>NHBEE
+          <br />NHBEE
         </p>
       </div>
     </div>
     <div class="sidebar-list-div">
       <div class="list-div">
-        <sidebaritem linkto="/" icon="fas fa-tachometer-alt" label="Dashboard"/>
-        <sidebaritem linkto="/post" icon="fas fa-quote-right" label="โพสต์"/>
-        <sidebaritem linkto="/library" icon="fas fa-images" label="คลัง"/>
-        <sidebaritem linkto="/survey" icon="fas fa-poll-h" label="แบบสอบถาม"/>
-        <sidebaritem v-if="isAdmin" linkto="/users" icon="fas fa-user" label="จัดการผู้ใช้"/>
+        <sidebaritem linkto="/" icon="fas fa-tachometer-alt" label="Dashboard" />
+        <sidebaritem linkto="/post" icon="fas fa-quote-right" label="โพสต์" />
+        <sidebaritem linkto="/library" icon="fas fa-images" label="คลัง" />
+        <sidebaritem linkto="/survey" icon="fas fa-poll-h" label="แบบสอบถาม" />
+        <sidebaritem v-if="isAdmin" linkto="/users" icon="fas fa-user" label="จัดการผู้ใช้" />
       </div>
       <div class="signout-div" @click="logout">
         <i class="fas fa-sign-out-alt signout-btn-icon"></i>
@@ -26,8 +26,8 @@
 </template>
 
 <script>
-import sidebaritem from "@/components/sidebaritem.vue"
-import layout_login from '@/layouts/login.vue'
+import sidebaritem from "@/components/sidebaritem.vue";
+import layout_login from "@/layouts/login.vue";
 
 export default {
   name: "sidebar",
@@ -35,16 +35,16 @@ export default {
     sidebaritem
   },
   computed: {
-    isAdmin () {
-      return this.$store.getters.isAdmin
+    isAdmin() {
+      return this.$store.getters.isAdmin;
     }
   },
   methods: {
-    logout () {
-      this.$store.dispatch('logout').then(() => {
-        if (this.$route.path !== '/') this.$router.push('/')
-        else this.$emit(`update:layout`, layout_login)
-      })
+    logout() {
+      this.$store.dispatch("logout").then(() => {
+        if (this.$route.path !== "/") this.$router.push("/");
+        else this.$emit(`update:layout`, layout_login);
+      });
     }
   }
 };
@@ -57,6 +57,8 @@ export default {
 .display {
   display: grid;
   grid-template-rows: 250px calc(100vh - 250px);
+  width: 200px;
+  position: fixed;
 }
 .logo-div {
   display: flex;

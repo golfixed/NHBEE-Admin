@@ -1,7 +1,9 @@
 <template>
   <div class="main-layout-display" style="margin: 0px; padding: 0px;">
-    <sidebar/>
-    <slot/>
+    <sidebar />
+    <div class="display-area">
+      <slot />
+    </div>
   </div>
 </template>
 
@@ -18,6 +20,10 @@ export default {
 </script>
 
 <style>
+.display-area {
+  width: calc(100vw - 200px);
+  margin-left: 200px;
+}
 .main-layout-display {
   display: grid;
   grid-template-columns: 200px calc(100vw - 200px);
