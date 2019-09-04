@@ -11,15 +11,52 @@
       <button class="tab-item-inactive" v-if="current_tab != 'en'" @click="switchTab('en')">English</button>
     </div>
     <h1>{{current_tab}}</h1>
-    <div class="thai-post-box"></div>
+    <div v-if="current_tab === 'th'" class="thai-post-box">
+      <post-content v-model="th"/>
+    </div>
+    <div v-if="current_tab === 'en'" class="thai-post-box">
+      <post-content v-model="en"/>
+    </div>
+    <div>
+      <input v-model="author" placeholder="author"/>
+      <br>
+      <img v-if="pictureId" :src="pictureURL" :alt="pictureId" height="50px">
+      <p v-else>เลือกรูปภาพปก</p>
+      <select-picture v-model="pictureId" :url.sync="pictureURL"/>
+      <input type="date" v-model="publishDate" placeholder="Publish Date"/>
+      <button @click="savePost" :disabled="isLoadinig">Save</button>
+    </div>
   </div>
 </template>
 <script>
+import axios from '@/axios.js'
+import postcontent from '@/components/postcontent.vue'
+import selectpicture from '@/components/selectpicture.vue'
+
 export default {
   name: "newpost",
+  components: {
+    'post-content': postcontent,
+    'select-picture': selectpicture
+  },
   data() {
     return {
-      current_tab: "th"
+      current_tab: "th",
+      th: {
+        title: "",
+        description: "",
+        article: []
+      },
+      en: {
+        title: "",
+        description: "",
+        article: []
+      },
+      author: "",
+      pictureId: null,
+      pictureURL: "",
+      publishDate: "",
+      isLoadinig: false
     };
   },
   props: {
@@ -28,6 +65,63 @@ export default {
   methods: {
     switchTab: function(target) {
       this.current_tab = target;
+    },
+    clearPost () {
+      this.th = {
+        title: "",
+        description: "",
+        article: []
+      }
+      this.en = {
+        title: "",
+        description: "",
+        article: []
+      }
+      this.author = "",
+      this.pictureId = null,
+      this.pictureURL = "",
+      this.publishDate = ""
+    },
+    savePost () {
+      if (this.isLoadinig) return ''
+      this.isLoadinig = true
+      const sendData = {
+        th: this.th,
+        en: this.en,
+        author: this.author,
+        pictureId: this.pictureId,
+        publishDate: this.publishDate
+      }
+      const article_th = []
+      for (const i in sendData.th.article) {
+        const article = sendData.th.article[i]
+        article_th.push({
+          type: article.type,
+          data: article.data
+        })
+      }
+      sendData.th.article = article_th
+      const article_en = []
+      for (const i in sendData.en.article) {
+        const article = sendData.en.article[i]
+        article_en.push({
+          type: article.type,
+          data: article.data
+        })
+      }
+      sendData.en.article = article_en
+
+      axios.post('/admin/news', sendData).then(response => {
+        this.clearPost()
+        this.newPostClose()
+        alert('News ID: ' + response.data.id)
+      }).catch(error => {
+        if (error.response && error.response.data)
+          console.error("save news", error.response.data.error)
+        else console.error("save news", error.message)
+      }).finally(() => {
+        this.isLoadinig = false
+      })
     }
   }
 };
