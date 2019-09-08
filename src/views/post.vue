@@ -1,7 +1,7 @@
 <template>
   <div class="isdesktop">
     <h1 class="tab-headtext" style="margin-bottom: 20px;">โพสต์ - บทความ</h1>
-    <div class="toolbar">
+    <div class="post-toolbar">
       <div class="toolbar-button" @click="newPostOpen();">
         <span>บทความใหม่</span>
         <i class="fas fa-edit toolbar-btn-icon"></i>
@@ -39,10 +39,8 @@
       </div>
       <div v-if="newsData">{{ newsData }}</div>
     </div>
-    <div class="newpost-box-bg" v-if="isOpenNewPost === true">
-      <div class="newpost-window">
-        <newpost :newPostClose="newPostClose" />
-      </div>
+    <div class="newpost-window" v-if="isOpenNewPost === true">
+      <newpost :newPostClose="newPostClose" />
     </div>
   </div>
 </template>
@@ -119,25 +117,14 @@ export default {
 </script>
 
 <style>
-.newpost-box-bg {
-  position: absolute;
-  z-index: 5;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: #00000075;
-}
 .newpost-window {
   position: absolute;
-  width: 1000px;
-  height: 630px;
+  width: 100vw;
+  height: 100vh;
   background-color: #fff;
-  border-radius: 5px;
-  padding: 20px;
+  border-radius: 0;
+  top: 0;
+  left: 0;
 }
 .post-view {
   background-color: #ffffff;
@@ -168,7 +155,7 @@ export default {
   border-radius: 5px;
   border: 1px solid #aaaaaa;
 }
-.toolbar {
+.post-toolbar {
   display: flex;
   margin-bottom: 20px;
 }

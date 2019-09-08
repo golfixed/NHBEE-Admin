@@ -8,8 +8,7 @@ Vue.use(Router)
 const router = new Router({
   mode: 'history',
   base: process.env.BASE_URL,
-  routes: [
-    {
+  routes: [{
       path: '/',
       name: 'home',
       component: Home
@@ -37,6 +36,14 @@ const router = new Router({
         requiresAuth: true
       },
       component: () => import('./views/Survey.vue')
+    },
+    {
+      path: '/homeslide',
+      name: 'homeslide',
+      meta: {
+        requiresAuth: true
+      },
+      component: () => import('./views/homeslide.vue')
     },
     {
       path: '/users',

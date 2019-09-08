@@ -12,6 +12,7 @@
     <div class="sidebar-list-div">
       <div class="list-div">
         <sidebaritem linkto="/" icon="fas fa-tachometer-alt" label="Dashboard" />
+        <sidebaritem linkto="/homeslide" icon="fas fa-image" label="สไลด์" />
         <sidebaritem linkto="/post" icon="fas fa-quote-right" label="โพสต์" />
         <sidebaritem linkto="/library" icon="fas fa-images" label="คลัง" />
         <sidebaritem linkto="/survey" icon="fas fa-poll-h" label="แบบสอบถาม" />
