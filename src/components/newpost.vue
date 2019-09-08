@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="padding: 20px;">
     <div class="control-tab">
       <h3 class="window-headtext">บทความใหม่</h3>
       <i @click="newPostClose();" class="fas fa-times close-btn"></i>
