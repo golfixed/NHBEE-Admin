@@ -1,5 +1,10 @@
 <template>
   <div class="isdesktop">
+    <div
+      style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:20px;"
+    >
+      <h1 class="tab-headtext">คลังรูปภาพ และ เอกสารPDF</h1>
+    </div>
     <div class="tab-panel">
       <button
         class="tab-item-active"
@@ -376,9 +381,6 @@ export default {
 }
 .pagination-current {
   padding: 0 20px;
-}
-.tab-headtext {
-  margin: 20px 0;
 }
 .tab-panel {
   width: 100%;

@@ -22,6 +22,14 @@ const router = new Router({
       component: () => import('./views/post.vue')
     },
     {
+      path: '/research',
+      name: 'research',
+      meta: {
+        requiresAuth: true
+      },
+      component: () => import('./views/research.vue')
+    },
+    {
       path: '/library',
       name: 'library',
       meta: {

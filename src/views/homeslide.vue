@@ -1,0 +1,44 @@
+<template>
+  <div class="isdesktop">
+    <div
+      style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:20px;"
+    >
+      <h1 class="tab-headtext">Slideshow</h1>
+    </div>
+  </div>
+</template>
+
+<script>
+import layout_default from "@/layouts/main.vue";
+export default {
+  name: "homeslide",
+  created() {
+    this.$emit(`update:layout`, layout_default);
+  }
+};
+// import axios from '@/axios.js'
+
+// export default {
+//   name: 'survey',
+// created () {
+//   // test get file excel
+//   axios({
+//     method: 'post',
+//     url: '/admin/survey/full',
+//     data: {
+//       // id: [1,2]
+//       id: 'all'
+//     }
+//   }).then(response => {
+//     console.log('survey', response.data)
+//     const url = response.data.url
+//     // window.open(url, 'blank')
+//   }).catch(error => {
+//     console.error('survey', error.message, error.response.data)
+//   })
+// }
+// }
+</script>
+
+<style>
+</style>

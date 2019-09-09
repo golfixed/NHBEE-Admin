@@ -3,10 +3,10 @@
     <div
       style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:20px;"
     >
-      <h1 class="tab-headtext">บทความ</h1>
+      <h1 class="tab-headtext">งานวิจัย</h1>
       <div class="post-toolbar">
         <div class="toolbar-button" @click="newPostOpen();">
-          <span>บทความใหม่</span>
+          <span>รายการงานวิจัยใหม่</span>
           <i class="fas fa-edit toolbar-btn-icon"></i>
         </div>
       </div>
@@ -19,29 +19,27 @@
         </div>
       </div>
       <div>
-        <table>
+        <table style="width: 100%;">
           <thead>
-            <tr style="height: 30px;">
-              <th style="width:20%;color:#808080;">วันที่</th>
+            <tr style="height:30px;">
               <th style="width:80%;color:#808080;">ชื่อ</th>
               <th style="width:15%;color:#808080;">แก้ไข</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="news in dataList" :key="'news_' + news.id" class="news-list">
-              <td>{{ news.date }}</td>
+            <tr v-for="research in dataList" :key="'news_' + research.id" class="research-list">
               <td>
-                <div class="news-list-title">{{ news.title_th }} ({{ news.title_en }})</div>
+                <div class="research-list-title">{{ research.th.title }} ({{ research.en.title }})</div>
               </td>
-              <td style="justify-content:center;align-items:center;">
-                <button @click="editNews(news.id)">
+              <td style="text-align:center;align-items:center;">
+                <button @click="editResearch(research.id)">
                   <i class="fas fa-edit" />
                 </button>
               </td>
             </tr>
           </tbody>
         </table>
-        <div class="post-pagination" style="margin-top: 20px;">
+        <div class="research-pagination" style="margin-top: 20px;">
           <button
             class="pagination-btn prev-btn"
             v-if="this.page.now != 1"
@@ -92,19 +90,20 @@ export default {
     };
   },
   created() {
-    this.getNews();
+    this.getResearch();
     this.$emit(`update:layout`, layout_default);
   },
   methods: {
-    getNews() {
+    getResearch() {
       if (this.isLoading) return "";
       this.isLoading = true;
       axios(
-        `/admin/news?limit=${this.limit}&page=${this.page.now}&q=${this.search}`
+        `/admin/research?limit=${this.limit}&page=${this.page.now}&q=${this.search}`
       )
         .then(response => {
           const data = response.data;
-          this.dataList = data.news.data;
+          this.dataList = data.research.data;
+          console.log(this.dataList);
         })
         .catch(error => {
           if (error.response && error.response.data)
@@ -161,18 +160,18 @@ export default {
 </script>
 
 <style>
-.news-list-title {
+.research-list-title {
   display: -webkit-box;
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
   padding-right: 10px;
 }
-.news-list {
+.research-list {
   transition: all 0.1s;
   height: 40px;
 }
-.news-list:hover {
+.research-list:hover {
   -webkit-transition: all 0.1s;
   transition: all 0.1s;
   cursor: pointer;
@@ -210,7 +209,7 @@ export default {
   position: absolute;
   right: 0;
 }
-.post-pagination {
+.research-pagination {
   grid-column: span 5;
   grid-row: 3;
   display: flex;

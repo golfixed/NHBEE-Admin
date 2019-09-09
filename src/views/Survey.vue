@@ -1,5 +1,11 @@
 <template>
-  <div class="isdesktop">Survey</div>
+  <div class="isdesktop">
+    <div
+      style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:20px;"
+    >
+      <h1 class="tab-headtext">ผลแบบสำรวจ</h1>
+    </div>
+  </div>
 </template>
 
 <script>

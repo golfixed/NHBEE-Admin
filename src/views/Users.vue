@@ -1,8 +1,17 @@
 
 <template>
   <div class="isdesktop">
-    User
-    <br />
+    <div
+      style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:20px;"
+    >
+      <h1 class="tab-headtext">บัญชีผู้ใช้</h1>
+      <div class="post-toolbar">
+        <div class="toolbar-button" @click="newPostOpen();">
+          <span>เพิ่มบัญชีใหม่</span>
+          <i class="fas fa-edit toolbar-btn-icon"></i>
+        </div>
+      </div>
+    </div>
     <table>
       <tr>
         <th>ID</th>
