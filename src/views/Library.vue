@@ -1,5 +1,10 @@
 <template>
   <div class="isdesktop">
+    <div
+      style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:20px;"
+    >
+      <h1 class="tab-headtext">คลังรูปภาพ และ เอกสารPDF</h1>
+    </div>
     <div class="tab-panel">
       <button
         class="tab-item-active"
@@ -32,7 +37,7 @@
             <i class="fas fa-arrow-up" style="margin-right: 10px;"></i>
             <h5>อัปโหลดรูปภาพใหม่</h5>
           </div>
-          <div class="toolbar">
+          <div class="lib-toolbar">
             <div class="upload-panel">
               <div>
                 <h5>1. เลือกไฟล์</h5>
@@ -56,7 +61,7 @@
               <div>
                 <h5>3. อัปโหลด</h5>
                 <button
-                  class="toolbar-button"
+                  class="lib-toolbar-button"
                   :disabled="!file || isUploading"
                   @click="uploadFile('picture')"
                 >
@@ -106,7 +111,7 @@
           <i class="fas fa-arrow-up" style="margin-right: 10px;"></i>
           <h5>อัปโหลดเอกสารใหม่</h5>
         </div>
-        <div class="toolbar">
+        <div class="lib-toolbar">
           <div class="upload-panel">
             <div>
               <h5>1. เลือกไฟล์</h5>
@@ -130,7 +135,7 @@
             <div>
               <h5>3. อัปโหลด</h5>
               <button
-                class="toolbar-button"
+                class="lib-toolbar-button"
                 :disabled="!file || isUploading"
                 @click="uploadFile('pdf')"
               >
@@ -157,6 +162,23 @@
               <i class="fas fa-trash-alt"></i>
             </button>
           </div>
+          <div class="image-pagination" style="margin-top: 20px;">
+            <button
+              class="pagination-btn prev-btn"
+              v-if="this.page.now != 1"
+              @click="prevPage('pdf', page.now);"
+            >
+              <i class="fas fa-arrow-left"></i>
+            </button>
+            <div class="pagination-current">{{page.now}} จาก {{page.all}} หน้า</div>
+            <button
+              class="pagination-btn next-btn"
+              v-if="this.page.now != this.page.all"
+              @click="nextPage('pdf', page.now);"
+            >
+              <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -168,9 +190,6 @@ import layout_default from "@/layouts/main.vue";
 import axios from "@/axios.js";
 export default {
   name: "library",
-  created() {
-    this.$emit(`update:layout`, layout_default);
-  },
   data() {
     return {
       current_tab: "image",
@@ -188,6 +207,7 @@ export default {
   },
   created() {
     this.loadFileList(this.current_tab, 1);
+    this.$emit(`update:layout`, layout_default);
   },
   methods: {
     refreshList: function() {
@@ -302,6 +322,7 @@ export default {
           .delete(`/admin/pdf/${pdf.id}`)
           .then(response => {
             this.documentList.splice(index, 1);
+            this.loadFileList("pdf", 1);
           })
           .catch(error => {
             if (error.response && error.response.data)
@@ -361,9 +382,6 @@ export default {
 .pagination-current {
   padding: 0 20px;
 }
-.tab-headtext {
-  margin: 20px 0;
-}
 .tab-panel {
   width: 100%;
 }
@@ -371,6 +389,7 @@ export default {
   background-color: #fff !important;
   font-weight: bold;
   border: 0;
+  border-width: 3px 0 0 0;
 }
 .tab-item-inactive {
   border-width: 0;
@@ -379,7 +398,7 @@ export default {
 .tab-item-active {
   width: fit-content;
   background-color: transparent;
-  height: 30px;
+  height: 40px;
   border-radius: 0;
   font-size: 15px;
   outline: none;
@@ -405,15 +424,14 @@ export default {
   border: 0;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  grid-template-rows: repeat(2, 150px);
+  grid-template-rows: repeat(2, 100px);
   grid-gap: 20px;
   padding: 20px;
 }
 .image-item {
   position: relative;
   transition: all 0.1s;
-  height: 150px;
-  max-height: 150px;
+  height: 100px;
   overflow: hidden;
 }
 .image-item:hover {
@@ -473,7 +491,7 @@ export default {
   position: relative;
   align-items: center;
   font-size: 20px;
-  padding: 10px 20px;
+  padding: 5px 20px;
   transition: all 0.1s;
 }
 .doc-item:hover {
@@ -514,13 +532,13 @@ export default {
   border: 0;
   font-size: 17px;
 }
-.toolbar {
+.lib-toolbar {
   display: block;
   padding: 0 20px 20px 20px;
   background-color: #fff;
   position: relative;
 }
-.toolbar-button {
+.lib-toolbar-button {
   width: -webkit-fit-content;
   width: -moz-fit-content;
   width: fit-content;
@@ -539,13 +557,13 @@ export default {
   -webkit-transition: all 0.1s;
   transition: all 0.1s;
 }
-.toolbar-button:hover {
+.lib-toolbar-button:hover {
   background-color: rgb(35, 124, 0);
   color: #fff;
   transition: all 0.1s;
   cursor: pointer;
 }
-.toolbar-btn-icon {
+.lib-toolbar-btn-icon {
   margin-left: 10px;
 }
 .upload-text {

@@ -3,7 +3,7 @@
     <div
       style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:20px;"
     >
-      <h1 class="tab-headtext">ผลแบบสำรวจ</h1>
+      <h1 class="tab-headtext">Slideshow</h1>
     </div>
   </div>
 </template>
@@ -11,7 +11,7 @@
 <script>
 import layout_default from "@/layouts/main.vue";
 export default {
-  name: "survey",
+  name: "homeslide",
   created() {
     this.$emit(`update:layout`, layout_default);
   }
