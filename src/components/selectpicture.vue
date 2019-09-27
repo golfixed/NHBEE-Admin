@@ -15,7 +15,7 @@
         <button @click="getPicture(page.now + 1)" v-if="page.now < page.all"><i class="fas fa-arrow-right"></i></button>
       </div>
       <div>
-        <button @click="savePicture" :disabled="!(selectedIndex >= 0 && selectedIndex < pictureList.length)">Save</button>
+        <button @click="savePicture" :disabled="!(selectedIndex >= 0 && selectedIndex < pictureList.length)">Select</button>
         <button @click="clearClose">Cancel</button>
       </div>
     </div>

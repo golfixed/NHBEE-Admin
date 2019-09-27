@@ -1,7 +1,7 @@
 <template>
   <div style="padding: 20px;">
     <div class="control-tab">
-      <h3 class="window-headtext">บทความใหม่</h3>
+      <h3 class="window-headtext">{{ saveId ? 'แก้ไขบทความ' : 'บทความใหม่' }}</h3>
       <i @click="newPostClose();" class="fas fa-times close-btn"></i>
     </div>
     <div class="tab-panel">
@@ -34,7 +34,7 @@ import postcontent from '@/components/postcontent.vue'
 import selectpicture from '@/components/selectpicture.vue'
 
 export default {
-  name: "newpost",
+  name: "post-editor",
   components: {
     'post-content': postcontent,
     'select-picture': selectpicture
@@ -56,11 +56,21 @@ export default {
       pictureId: null,
       pictureURL: "",
       publishDate: "",
+      saveId: null,
       isLoadinig: false
     };
   },
   props: {
-    newPostClose: Function
+    newPostClose: Function,
+    newsId: Number
+  },
+  created () {
+    this.getPost(this.newsId)
+  },
+  watch: {
+    newsId (value) {
+      this.getPost(value)
+    }
   },
   methods: {
     switchTab: function(target) {
@@ -77,10 +87,29 @@ export default {
         description: "",
         article: []
       }
-      this.author = "",
-      this.pictureId = null,
-      this.pictureURL = "",
+      this.author = ""
+      this.pictureId = null
+      this.pictureURL = ""
       this.publishDate = ""
+      this.saveId = null
+    },
+    getPost (newsId) {
+      if (!newsId) return this.clearPost()
+      axios.get(`/admin/news/${this.newsId}`).then(response => {
+        const data = response.data
+        this.th = data.th
+        this.en = data.en
+        this.author = data.author
+        this.pictureId = data.pictureId
+        this.pictureURL = data.pictureURL
+        this.publishDate = data.publishDate
+        this.saveId = data.id
+      }).catch(error => {
+        if (error.response && error.response.data)
+          console.error("get news", error.response.data.error)
+        else console.error("get news", error.message)
+        this.clearPost()
+      })
     },
     savePost () {
       if (this.isLoadinig) return ''
@@ -111,10 +140,14 @@ export default {
       }
       sendData.en.article = article_en
 
-      axios.post('/admin/news', sendData).then(response => {
+      axios({
+        url: `/admin/news${this.saveId ? '/' + this.saveId : ''}`,
+        method: this.saveId ? 'put' : 'post',
+        data: sendData
+      }).then(response => {
         this.clearPost()
         this.newPostClose()
-        alert('News ID: ' + response.data.id)
+        // alert('News ID: ' + response.data.id)
       }).catch(error => {
         if (error.response && error.response.data)
           console.error("save news", error.response.data.error)
