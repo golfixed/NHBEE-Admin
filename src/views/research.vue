@@ -22,18 +22,24 @@
         <table style="width: 100%;">
           <thead>
             <tr style="height:30px;">
-              <th style="width:80%;color:#808080;">ชื่อ</th>
-              <th style="width:15%;color:#808080;">แก้ไข</th>
+              <th width="88%" style="color:#808080;">ชื่อ</th>
+              <th width="6%" style="color:#808080;">แก้ไข</th>
+              <th width="6%" style="color:#808080;">ลบ</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="research in dataList" :key="'research_' + research.id" class="research-list">
+            <tr v-for="(research, index) in dataList" :key="'research_' + research.id" class="research-list">
               <td>
                 <div class="research-list-title">{{ research.th.title }} ({{ research.en.title }})</div>
               </td>
               <td style="text-align:center;align-items:center;">
                 <button @click="editResearch(research.id)">
                   <i class="fas fa-edit" />
+                </button>
+              </td>
+              <td style="text-align:center;align-items:center;">
+                <button @click="deleteResearch(index)">
+                  <i class="fas fa-trash" />
                 </button>
               </td>
             </tr>
@@ -138,6 +144,21 @@ export default {
         }
       } else {
         this.page.now = 1;
+      }
+    },
+    deleteResearch: function (index = -1) {
+      if (!this.dataList[index]) return ''
+      if (confirm(`ยืนยันการลบงานวิจัยนี้?`)) {
+        axios({
+          method: 'delete',
+          url: `/admin/research/${this.dataList[index].id}`
+        }).then(() => {
+          this.dataList.splice(index, 1)
+        }).catch(error => {
+          if (error.response && error.response.data)
+            console.error("patch news", error.response.data.error);
+          else console.error("patch news", error.message);
+        })
       }
     }
   }

@@ -19,16 +19,17 @@
         </div>
       </div>
       <div>
-        <table>
+        <table style="width: 100%;">
           <thead>
             <tr style="height: 30px;">
-              <th style="width:20%;color:#808080;">วันที่</th>
-              <th style="width:80%;color:#808080;">ชื่อ</th>
-              <th style="width:15%;color:#808080;">แก้ไข</th>
+              <th width="15%" style="color:#808080;">วันที่</th>
+              <th width="55%" style="color:#808080;">ชื่อ</th>
+              <th width="6%" style="color:#808080;">แก้ไข</th>
+              <th width="6%" style="color:#808080;">เผยแพร่</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="news in dataList" :key="'news_' + news.id" class="news-list">
+            <tr v-for="(news, index) in dataList" :key="'news_' + news.id" class="news-list">
               <td>{{ news.date }}</td>
               <td>
                 <div class="news-list-title">{{ news.title_th }} ({{ news.title_en }})</div>
@@ -36,6 +37,11 @@
               <td style="justify-content:center;align-items:center;">
                 <button @click="editPost(news.id)">
                   <i class="fas fa-edit" />
+                </button>
+              </td>
+              <td>
+                <button @click="publish(index, !news.status)">
+                  <i :class="`fas fa-globe globe-${(news.status ? '' : 'un')}publish`" />
                 </button>
               </td>
             </tr>
@@ -140,6 +146,25 @@ export default {
         }
       } else {
         this.page.now = 1;
+      }
+    },
+    publish: function (index = -1, status = false) {
+      if (!this.dataList[index]) return ''
+      const news = this.dataList[index]
+      if (confirm(`ยืนยันการ ${status ? 'เผยแพร่' : 'ซ่อน'} บทความนี้?`)) {
+        axios({
+          method: 'patch',
+          url: `/admin/news/${news.id}/${status ? '' : 'un'}publish`
+        }).then(() => {
+          const data = this.dataList[index]
+          this.dataList[index] = null
+          data.status = !!status
+          this.dataList[index] = data
+        }).catch(error => {
+          if (error.response && error.response.data)
+            console.error("patch news", error.response.data.error);
+          else console.error("patch news", error.message);
+        })
       }
     }
   }
@@ -267,5 +292,11 @@ export default {
 }
 .toolbar-btn-icon {
   margin-left: 10px;
+}
+.globe-publish {
+  color: green;
+}
+.globe-unpublish {
+  color: grey;
 }
 </style>

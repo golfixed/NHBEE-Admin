@@ -122,6 +122,7 @@ export default {
         publishDate: this.publishDate
       }
       const article_th = []
+      const article_en = []
       for (const i in sendData.th.article) {
         const article = sendData.th.article[i]
         article_th.push({
@@ -129,8 +130,6 @@ export default {
           data: article.data
         })
       }
-      sendData.th.article = article_th
-      const article_en = []
       for (const i in sendData.en.article) {
         const article = sendData.en.article[i]
         article_en.push({
@@ -138,6 +137,7 @@ export default {
           data: article.data
         })
       }
+      sendData.th.article = article_th
       sendData.en.article = article_en
 
       axios({
