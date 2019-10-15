@@ -237,7 +237,7 @@ export default {
   },
   methods: {
     getAnalyticData() {
-      axios("/admin/dashboard/analytic")
+      axios.get("/admin/dashboard/analytic")
         .then(response => {
           this.analyticData = response.data;
         })

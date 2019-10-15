@@ -49,6 +49,12 @@ const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         commit('auth_logout')
         localStorage.removeItem('token')
+        axios.post('/admin/auth/logout').then(() => {
+          console.log('reject token success')
+        }).catch(error => {
+          if (error.response && error.response.data) console.log('reject token error:', error.response.data.error)
+          else console.log('reject token error:', error.message)
+        })
         delete axios.defaults.headers.common['Authorization']
         return resolve()
       })

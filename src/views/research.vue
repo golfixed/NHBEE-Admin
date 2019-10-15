@@ -5,7 +5,7 @@
     >
       <h1 class="tab-headtext">งานวิจัย</h1>
       <div class="post-toolbar">
-        <div class="toolbar-button" @click="newPostOpen();">
+        <div class="toolbar-button" @click="newResearch();">
           <span>รายการงานวิจัยใหม่</span>
           <i class="fas fa-edit toolbar-btn-icon"></i>
         </div>
@@ -15,25 +15,31 @@
       <div class="searchbox-div">
         <div class="form-set">
           <p class="form-set-label">ค้นหาด้วยชื่อ</p>
-          <input v-model="search" class="form-set-input" type="text" @keypress.enter="getNews" />
+          <input v-model="search" class="form-set-input" type="text" @keypress.enter="getResearch" />
         </div>
       </div>
       <div>
         <table style="width: 100%;">
           <thead>
             <tr style="height:30px;">
-              <th style="width:80%;color:#808080;">ชื่อ</th>
-              <th style="width:15%;color:#808080;">แก้ไข</th>
+              <th width="88%" style="color:#808080;">ชื่อ</th>
+              <th width="6%" style="color:#808080;">แก้ไข</th>
+              <th width="6%" style="color:#808080;">ลบ</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="research in dataList" :key="'news_' + research.id" class="research-list">
+            <tr v-for="(research, index) in dataList" :key="'research_' + research.id" class="research-list">
               <td>
                 <div class="research-list-title">{{ research.th.title }} ({{ research.en.title }})</div>
               </td>
               <td style="text-align:center;align-items:center;">
                 <button @click="editResearch(research.id)">
                   <i class="fas fa-edit" />
+                </button>
+              </td>
+              <td style="text-align:center;align-items:center;">
+                <button @click="deleteResearch(index)">
+                  <i class="fas fa-trash" />
                 </button>
               </td>
             </tr>
@@ -57,10 +63,9 @@
           </button>
         </div>
       </div>
-      <div v-if="newsData">{{ newsData }}</div>
     </div>
     <div class="newpost-window" v-if="isOpenNewPost === true">
-      <newpost :newPostClose="newPostClose" />
+      <research-editor :newPostClose="newPostClose" :researchId="researchId"/>
     </div>
   </div>
 </template>
@@ -68,25 +73,25 @@
 <script>
 import axios from "@/axios.js";
 import layout_default from "@/layouts/main.vue";
-import newpost from "@/components/newpost.vue";
+import ResearchEditor from "@/components/ResearchEditor.vue";
 
 export default {
-  name: "post",
+  name: "research",
   components: {
-    newpost
+    ResearchEditor
   },
   data() {
     return {
       dataList: [],
-      newsData: null,
       isLoading: false,
       search: "",
-      limit: 6,
+      limit: 10,
       isOpenNewPost: false,
       page: {
         now: 1,
-        all: 1
-      }
+        all: 0
+      },
+      researchId: null
     };
   },
   created() {
@@ -94,41 +99,33 @@ export default {
     this.$emit(`update:layout`, layout_default);
   },
   methods: {
-    getResearch() {
+    getResearch(page = 1) {
       if (this.isLoading) return "";
       this.isLoading = true;
       axios(
-        `/admin/research?limit=${this.limit}&page=${this.page.now}&q=${this.search}`
+        `/admin/research?limit=${this.limit}&page=${page}&q=${this.search}`
       )
         .then(response => {
           const data = response.data;
           this.dataList = data.research.data;
-          console.log(this.dataList);
+          this.page = data.page
         })
         .catch(error => {
           if (error.response && error.response.data)
-            console.error("get news", error.response.data.error);
-          else console.error("get news", error.message);
+            console.error("get research", error.response.data.error);
+          else console.error("get research", error.message);
         })
         .finally(() => {
           this.isLoading = false;
         });
     },
-    editNews(id) {
-      if (this.isLoading) return "";
-      this.isLoading = true;
-      axios(`/admin/news/${id}`)
-        .then(response => {
-          this.newsData = response.data;
-        })
-        .catch(error => {
-          if (error.response && error.response.data)
-            console.error("get news", error.response.data.error);
-          else console.error("get news", error.message);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+    editResearch(id) {
+      this.researchId = id
+      this.newPostOpen()
+    },
+    newResearch() {
+      this.researchId = null
+      this.newPostOpen()
     },
     newPostOpen: function() {
       this.isOpenNewPost = true;
@@ -138,21 +135,30 @@ export default {
     },
     changePage: function(direction) {
       if (direction === "previous") {
-        if (this.page.now < this.page.all) {
-          this.page.now = this.page.now;
-        } else {
-          this.page.now = this.page.now - 1;
-          this.fetchNewsList();
+        if (this.page.now > 1 && this.page.now <= this.page.all) {
+          this.getResearch(this.page.now - 1);
         }
       } else if (direction === "next") {
-        if (this.page.now >= this.page.all) {
-          this.page.now = this.page.now;
-        } else {
-          this.page.now = this.page.now + 1;
-          this.fetchNewsList();
+        if (this.page.now < this.page.all) {
+          this.getResearch(this.page.now + 1);
         }
       } else {
         this.page.now = 1;
+      }
+    },
+    deleteResearch: function (index = -1) {
+      if (!this.dataList[index]) return ''
+      if (confirm(`ยืนยันการลบงานวิจัยนี้?`)) {
+        axios({
+          method: 'delete',
+          url: `/admin/research/${this.dataList[index].id}`
+        }).then(() => {
+          this.dataList.splice(index, 1)
+        }).catch(error => {
+          if (error.response && error.response.data)
+            console.error("patch news", error.response.data.error);
+          else console.error("patch news", error.message);
+        })
       }
     }
   }

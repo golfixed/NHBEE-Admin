@@ -5,7 +5,7 @@
     >
       <h1 class="tab-headtext">บทความ</h1>
       <div class="post-toolbar">
-        <div class="toolbar-button" @click="newPostOpen();">
+        <div class="toolbar-button" @click="newPost();">
           <span>บทความใหม่</span>
           <i class="fas fa-edit toolbar-btn-icon"></i>
         </div>
@@ -19,23 +19,29 @@
         </div>
       </div>
       <div>
-        <table>
+        <table style="width: 100%;">
           <thead>
             <tr style="height: 30px;">
-              <th style="width:20%;color:#808080;">วันที่</th>
-              <th style="width:80%;color:#808080;">ชื่อ</th>
-              <th style="width:15%;color:#808080;">แก้ไข</th>
+              <th width="15%" style="color:#808080;">วันที่</th>
+              <th width="55%" style="color:#808080;">ชื่อ</th>
+              <th width="6%" style="color:#808080;">แก้ไข</th>
+              <th width="6%" style="color:#808080;">เผยแพร่</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="news in dataList" :key="'news_' + news.id" class="news-list">
+            <tr v-for="(news, index) in dataList" :key="'news_' + news.id" class="news-list">
               <td>{{ news.date }}</td>
               <td>
                 <div class="news-list-title">{{ news.title_th }} ({{ news.title_en }})</div>
               </td>
               <td style="justify-content:center;align-items:center;">
-                <button @click="editNews(news.id)">
+                <button @click="editPost(news.id)">
                   <i class="fas fa-edit" />
+                </button>
+              </td>
+              <td>
+                <button @click="publish(index, !news.status)">
+                  <i :class="`fas fa-globe globe-${(news.status ? '' : 'un')}publish`" />
                 </button>
               </td>
             </tr>
@@ -59,10 +65,9 @@
           </button>
         </div>
       </div>
-      <div v-if="newsData">{{ newsData }}</div>
     </div>
     <div class="newpost-window" v-if="isOpenNewPost === true">
-      <newpost :newPostClose="newPostClose" />
+      <post-editor :newPostClose="newPostClose" :news-id="newsId"/>
     </div>
   </div>
 </template>
@@ -70,25 +75,25 @@
 <script>
 import axios from "@/axios.js";
 import layout_default from "@/layouts/main.vue";
-import newpost from "@/components/newpost.vue";
+import PostEditor from "@/components/PostEditor.vue";
 
 export default {
   name: "post",
   components: {
-    newpost
+    PostEditor
   },
   data() {
     return {
       dataList: [],
-      newsData: null,
       isLoading: false,
       search: "",
-      limit: 6,
+      limit: 10,
       isOpenNewPost: false,
       page: {
         now: 1,
         all: 1
-      }
+      },
+      newsId: null
     };
   },
   created() {
@@ -96,15 +101,16 @@ export default {
     this.$emit(`update:layout`, layout_default);
   },
   methods: {
-    getNews() {
+    getNews(page = 1) {
       if (this.isLoading) return "";
       this.isLoading = true;
       axios(
-        `/admin/news?limit=${this.limit}&page=${this.page.now}&q=${this.search}`
+        `/admin/news?limit=${this.limit}&page=${page}&q=${this.search}`
       )
         .then(response => {
           const data = response.data;
           this.dataList = data.news.data;
+          this.page = data.page
         })
         .catch(error => {
           if (error.response && error.response.data)
@@ -115,21 +121,13 @@ export default {
           this.isLoading = false;
         });
     },
-    editNews(id) {
-      if (this.isLoading) return "";
-      this.isLoading = true;
-      axios(`/admin/news/${id}`)
-        .then(response => {
-          this.newsData = response.data;
-        })
-        .catch(error => {
-          if (error.response && error.response.data)
-            console.error("get news", error.response.data.error);
-          else console.error("get news", error.message);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+    editPost(id) {
+      this.newsId = id
+      this.newPostOpen()
+    },
+    newPost() {
+      this.newsId = null
+      this.newPostOpen()
     },
     newPostOpen: function() {
       this.isOpenNewPost = true;
@@ -139,21 +137,34 @@ export default {
     },
     changePage: function(direction) {
       if (direction === "previous") {
-        if (this.page.now < this.page.all) {
-          this.page.now = this.page.now;
-        } else {
-          this.page.now = this.page.now - 1;
-          this.fetchNewsList();
+        if (this.page.now > 1 && this.page.now <= this.page.all) {
+          this.getNews(this.page.now - 1);
         }
       } else if (direction === "next") {
-        if (this.page.now >= this.page.all) {
-          this.page.now = this.page.now;
-        } else {
-          this.page.now = this.page.now + 1;
-          this.fetchNewsList();
+        if (this.page.now < this.page.all) {
+          this.getNews(this.page.now + 1);
         }
       } else {
         this.page.now = 1;
+      }
+    },
+    publish: function (index = -1, status = false) {
+      if (!this.dataList[index]) return ''
+      const news = this.dataList[index]
+      if (confirm(`ยืนยันการ ${status ? 'เผยแพร่' : 'ซ่อน'} บทความนี้?`)) {
+        axios({
+          method: 'patch',
+          url: `/admin/news/${news.id}/${status ? '' : 'un'}publish`
+        }).then(() => {
+          const data = this.dataList[index]
+          this.dataList[index] = null
+          data.status = !!status
+          this.dataList[index] = data
+        }).catch(error => {
+          if (error.response && error.response.data)
+            console.error("patch news", error.response.data.error);
+          else console.error("patch news", error.message);
+        })
       }
     }
   }
@@ -281,5 +292,11 @@ export default {
 }
 .toolbar-btn-icon {
   margin-left: 10px;
+}
+.globe-publish {
+  color: green;
+}
+.globe-unpublish {
+  color: grey;
 }
 </style>
