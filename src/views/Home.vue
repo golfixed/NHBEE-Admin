@@ -5,16 +5,26 @@
     >
       <h1 class="tab-headtext">Dashboard</h1>
     </div>
-    <div>
-      <div class="test-all">Session: {{ analyticData.all.sessions || '-' }}</div>
-      <div class="test-all">Users: {{ analyticData.all.users || '-' }}</div>
-      <div class="test-all">New Users: {{ analyticData.all.newUsers || '-' }}</div>
-      <div class="test-all">Page Views: {{ analyticData.all.pageviews || '-' }}</div>
-    </div>
-    <div>
-      <div class="test-dimension">
+    <div class="highlight-card-display">
+      <div class="anlt-card short-card">
+        <h3>Session</h3>
+        <h1>{{ analyticData.all.sessions || '-' }}</h1>
+      </div>
+      <div class="anlt-card short-card">
+        <h3>Users</h3>
+        <h1>{{ analyticData.all.users || '-' }}</h1>
+      </div>
+      <div class="anlt-card short-card">
+        <h3>New Users</h3>
+        <h1>{{ analyticData.all.newUsers || '-' }}</h1>
+      </div>
+      <div class="anlt-card short-card">
+        <h3>Page Views</h3>
+        <h1>{{ analyticData.all.pageviews || '-' }}</h1>
+      </div>
+      <div class="anlt-card long-card">
         <h2>Social Network</h2>
-        <table width="100%" border="1">
+        <table width="100%">
           <tr>
             <th>Name</th>
             <th>Sessions</th>
@@ -31,9 +41,9 @@
           </tr>
         </table>
       </div>
-      <div class="test-dimension">
+      <div class="anlt-card long-card">
         <h2>Browser</h2>
-        <table width="100%" border="1">
+        <table width="100%">
           <tr>
             <th>Name</th>
             <th>Sessions</th>
@@ -50,9 +60,9 @@
           </tr>
         </table>
       </div>
-      <div class="test-dimension">
+      <div class="anlt-card long-card">
         <h2>Country</h2>
-        <table width="100%" border="1">
+        <table width="100%">
           <tr>
             <th>Name</th>
             <th>Sessions</th>
@@ -69,9 +79,9 @@
           </tr>
         </table>
       </div>
-      <div class="test-dimension">
+      <div class="anlt-card long-card">
         <h2>Channel Grouping</h2>
-        <table width="100%" border="1">
+        <table width="100%">
           <tr>
             <th>Name</th>
             <th>Sessions</th>
@@ -103,15 +113,113 @@ export default {
   data() {
     return {
       analyticData: {
-        all: {},
-        dimensions: {}
+        all: {
+          sessions: 230,
+          users: 120,
+          newUsers: 100,
+          pageviews: 2000
+        },
+        dimensions: {
+          socialNetwork: [
+            {
+              name: "Facebook",
+              sessions: 6,
+              users: 5,
+              newUsers: 1,
+              pageviews: 3
+            },
+            {
+              name: "LINE",
+              sessions: 6,
+              users: 5,
+              newUsers: 2,
+              pageviews: 9
+            }
+          ],
+          browser: [
+            {
+              name: "Chrome",
+              sessions: 6,
+              users: 5,
+              newUsers: 1,
+              pageviews: 3
+            },
+            {
+              name: "Safari",
+              sessions: 6,
+              users: 5,
+              newUsers: 0,
+              pageviews: 9
+            },
+            {
+              name: "Opera",
+              sessions: 6,
+              users: 5,
+              newUsers: 0,
+              pageviews: 9
+            },
+            {
+              name: "Firefox",
+              sessions: 6,
+              users: 5,
+              newUsers: 0,
+              pageviews: 9
+            }
+          ],
+          country: [
+            {
+              name: "Thailand",
+              sessions: 6,
+              users: 5,
+              newUsers: 1,
+              pageviews: 3
+            },
+            {
+              name: "Singapore",
+              sessions: 6,
+              users: 5,
+              newUsers: 0,
+              pageviews: 9
+            },
+            {
+              name: "Vietnam",
+              sessions: 12,
+              users: 10,
+              newUsers: 3,
+              pageviews: 12
+            }
+          ],
+          channelGrouping: [
+            {
+              name: "Direct",
+              sessions: 6,
+              users: 5,
+              newUsers: 1,
+              pageviews: 3
+            },
+            {
+              name: "Social",
+              sessions: 6,
+              users: 5,
+              newUsers: 0,
+              pageviews: 9
+            },
+            {
+              name: "Organic Search",
+              sessions: 6,
+              users: 5,
+              newUsers: 0,
+              pageviews: 9
+            }
+          ]
+        }
       }
     };
   },
   created() {
     if (this.isLoggedIn) {
       this.$emit(`update:layout`, layout_default);
-      this.getAnalyticData();
+      // this.getAnalyticData();
     } else this.$emit(`update:layout`, layout_login);
   },
   watch: {
@@ -143,9 +251,6 @@ export default {
 };
 </script>
 <style scoped>
-.home-display {
-  width: 1200px;
-}
 .test-all {
   display: inline-table;
   width: 275px;
@@ -157,6 +262,70 @@ export default {
   display: inline-table;
   width: 575px;
   margin: 12px;
+}
+.table-card-display {
+  width: calc(100vw - 200px);
+  display: block;
+}
+.highlight-card-display {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-gap: 20px;
+}
+.anlt-card {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 5px;
+}
+.short-card {
+  display: block;
+  -webkit-transition: all 0.1s;
+  transition: all 0.1s;
+  cursor: default;
+}
+.short-card:hover,
+.long-card:hover {
+  -webkit-transition: all 0.1s;
+  transition: all 0.1s;
+  -webkit-box-shadow: 0px 2px 5px 1px rgba(0, 0, 0, 0.22);
+  box-shadow: 0px 2px 5px 1px rgba(0, 0, 0, 0.22);
+  border-radius: 5px;
+}
+
+.long-card {
+  grid-column: span 2;
+}
+.short-card > h3 {
+  color: #808080;
+}
+.short-card > h1 {
+  font-size: 3rem;
+  text-align: center;
+  color: #c19d00;
+}
+.short-card > h3,
+.long-card > h2 {
+  color: #636363;
+  border: 1px solid #d6d6d6;
+  border-width: 0 0 1px 0;
+  padding-bottom: 5px;
+  text-align: left;
+}
+table > tr:first-child {
+  height: 30px;
+}
+table > tr:first-child:hover {
+  background-color: #fff;
+}
+table > tr:hover {
+  background-color: #f1f1f1;
+}
+tr > td {
+  border: 0;
+}
+tr > th {
+  color: #808080;
+  text-align: left;
 }
 </style>
 

@@ -83,7 +83,7 @@
                 <i class="fas fa-trash-alt"></i>
               </button>
             </div>
-            <div class="image-pagination">
+            <div class="image-pagination" v-if="imageList">
               <button
                 class="pagination-btn prev-btn"
                 v-if="this.page.now != 1"
