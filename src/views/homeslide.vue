@@ -27,20 +27,11 @@
               />
             </div>
             <div>
-              <h5>2. ตั้งชื่อไฟล์</h5>
-              <input
-                class="upload-name-file"
-                type="text"
-                v-model="filename"
-                :disabled="isUploading"
-              />
-            </div>
-            <div>
-              <h5>3. อัปโหลด</h5>
+              <h5>2. อัปโหลด</h5>
               <button
                 class="lib-toolbar-button"
                 :disabled="!file || isUploading"
-                @click="uploadFile('picture')"
+                @click="uploadFile()"
               >
                 <span>อัปโหลด</span>
                 <i class="fas fa-arrow-up" style="margin-left: 10px;"></i>
@@ -54,8 +45,8 @@
         </div>
         <div class="image-show-area">
           <div class="image-item" v-for="(data, i) in imageList" :key="i">
-            <img class="image-item-img" :src="data.pictureURL" />
-            <h5 class="image-item-filename">{{data.filename}}</h5>
+            <img class="image-item-img" :src="data.url" />
+            <h5 class="image-item-filename">{{data.id}}</h5>
             <button class="image-delete-btn" @click="deleteImage(i)">
               <i class="fas fa-trash-alt"></i>
             </button>
@@ -63,16 +54,16 @@
           <div class="image-pagination">
             <button
               class="pagination-btn prev-btn"
-              v-if="this.page.now != 1"
-              @click="prevPage('image', page.now);"
+              v-if="this.page.now > 1"
+              @click="prevPage(page.now);"
             >
               <i class="fas fa-arrow-left"></i>
             </button>
             <div class="pagination-current">{{page.now}} จาก {{page.all}} หน้า</div>
             <button
               class="pagination-btn next-btn"
-              v-if="this.page.now != this.page.all"
-              @click="nextPage('image', page.now);"
+              v-if="this.page.now < this.page.all"
+              @click="nextPage(page.now);"
             >
               <i class="fas fa-arrow-right"></i>
             </button>
@@ -90,12 +81,10 @@ export default {
   name: "homeslide",
   data() {
     return {
-      current_tab: "image",
       page: {
         now: 1,
         all: 0
       },
-      documentList: [],
       imageList: [],
       filename: "",
       file: null,
@@ -104,92 +93,74 @@ export default {
     };
   },
   created() {
-    this.loadFileList(this.current_tab, 1);
+    this.loadFileList(1);
     this.$emit(`update:layout`, layout_default);
   },
   methods: {
     refreshList: function() {
-      this.loadFileList(this.current_tab);
+      this.loadFileList();
     },
-    nextPage: function(target, page) {
+    nextPage: function(page) {
       if (this.page.now <= this.page.all) {
         this.page.now = this.page.now + 1;
-        this.loadFileList(target, this.page.now);
+        this.loadFileList(this.page.now);
       } else {
         this.page.now = this.page.now;
-        this.loadFileList(target, this.page.now);
+        this.loadFileList(this.page.now);
       }
     },
-    prevPage: function(target, page) {
+    prevPage: function(page) {
       if (this.page.now <= this.page.all && this.page.now != 0) {
         this.page.now = this.page.now - 1;
-        this.loadFileList(target, this.page.now);
+        this.loadFileList(this.page.now);
       } else {
         this.page.now = this.page.now;
-        this.loadFileList(target, this.page.now);
+        this.loadFileList(this.page.now);
       }
     },
-    switchTab: function(target) {
-      this.current_tab = target;
-      this.loadFileList(target);
+    loadFileList(page) {
+      axios(
+        `/admin/carousel?page=${page}&limit=10`
+      )
+        .then(response => {
+          this.page = response.data.page;
+          this.imageList = response.data.carousel.data;
+        })
+        .catch(error => {
+          if (error.response && error.response.data)
+            console.error("get file list", error.response.data.error);
+          else console.error("get file list", error.message);
+        });
     },
-    loadFileList(target, page) {
-      if (target === "pdf" || target === "image") {
-        axios(
-          `/admin/${
-            target === "image" ? "picture" : "pdf"
-          }?page=${page} &limit=10`
-        )
-          .then(response => {
-            this.page = response.data.page;
-            if (target === "pdf") this.documentList = response.data.file.data;
-            else this.imageList = response.data.file.data;
-          })
-          .catch(error => {
-            if (error.response && error.response.data)
-              console.error("get file list", error.response.data.error);
-            else console.error("get file list", error.message);
-          });
-      }
-    },
-    uploadFile(target) {
+    uploadFile() {
       if (this.isUploading) return "";
-      if (target !== "pdf" && target !== "picture") return "";
       this.isUploading = true;
       const formData = new FormData();
-      formData.append(target, this.file);
-      formData.append("name", this.filename);
+      formData.append("carousel", this.file);
       axios
-        .post(`/admin/${target}`, formData, {
+        .post(`/admin/carousel`, formData, {
           headers: { "Content-Type": "multipart/form-data" }
         })
         .then(response => {
           console.log("file id", response.data.id);
           this.filename = "";
           this.file = null;
-          if (target === "picture") {
-            this.imageList.push(response.data);
-            this.$refs.picture_input.value = "";
-            alert("อัปโหลดรูปภาพสำเร็จ");
-            this.loadFileList("image", 1);
-          } else {
-            this.documentList.push(response.data);
-            this.$refs.pdf_input.value = "";
-            alert("อัปโหลดไฟล์ PDF สำเร็จ");
-            this.loadFileList("pdf", 1);
-          }
+          this.imageList.push(response.data);
+          this.$refs.picture_input.value = "";
+          alert("อัปโหลดรูปภาพสำเร็จ");
+          this.loadFileList(1);
         })
         .catch(error => {
           if (error.response && error.response.data) {
             console.error("upload file", error.response.data.error);
-            if (error.response.data.error === "Picture already exists") {
+            if (error.response.data.error === "Carousel already exists") {
               alert("เกิดข้อผิดพลาด: อัปโหลดรูปภาพซ้ำ");
-            } else if (error.response.data.error === "No Picture") {
+            } else if (error.response.data.error === "No Carousel") {
               alert("เกิดข้อผิดพลาด: ไม่มีรูปภาพ หรือ รูปแบบรูปภาพไม่รองรับ");
-            } else if (error.response.data.error === "PDF already exists") {
-              alert("เกิดข้อผิดพลาด: อัปโหลดไฟล์ PDF ซ้ำ");
-            } else if (error.response.data.error === "No PDF") {
-              alert("เกิดข้อผิดพลาด: ไม่มีไฟล์ PDF หรือ รูปแบบไฟล์ไม่รองรับ");
+            } else if (error.response.data.error === "Upload unsuccessful") {
+              alert("เกิดข้อผิดพลาด: อัปโหลดไม่สำเร็จ");
+            } else if (error.response.data.error === "Only JPEG or PNG") {
+              alert("เกิดข้อผิดพลาด: รูปแบบรูปภาพไม่รองรับ");
             }
           } else console.error("upload file", error.message);
         })
@@ -199,33 +170,17 @@ export default {
     },
     deleteImage(index) {
       const image = this.imageList[index];
-      if (confirm(`ยืนยันว่าจะลบรูป ${image.filename}?`)) {
+      if (confirm(`ยืนยันว่าจะลบรูป ${image.id}?`)) {
         axios
-          .delete(`/admin/picture/${image.id}`)
+          .delete(`/admin/carousel/${image.id}`)
           .then(response => {
             this.imageList.splice(index, 1);
-            this.loadFileList("image", 1);
+            this.loadFileList(1);
           })
           .catch(error => {
             if (error.response && error.response.data)
-              console.error("delete image", error.response.data.error);
-            else console.error("delete image", error.message);
-          });
-      }
-    },
-    deletePdf(index) {
-      const pdf = this.documentList[index];
-      if (confirm(`ยืนยันว่าจะลบเอกสาร ${pdf.filename}?`)) {
-        axios
-          .delete(`/admin/pdf/${pdf.id}`)
-          .then(response => {
-            this.documentList.splice(index, 1);
-            this.loadFileList("pdf", 1);
-          })
-          .catch(error => {
-            if (error.response && error.response.data)
-              console.error("delete pdf", error.response.data.error);
-            else console.error("delete pdf", error.message);
+              console.error("delete", error.response.data.error);
+            else console.error("delete", error.message);
           });
       }
     },
