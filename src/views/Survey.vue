@@ -8,36 +8,47 @@
     <div class="tab-panel">
       <button
         class="tab-item-active"
-        v-if="current_tab === 'image'"
-        @click="switchTab('image')"
+        v-if="current_tab === 'full'"
+        @click="switchTab('full')"
       >แบบเต็ม</button>
       <button
         class="tab-item-inactive"
-        v-if="current_tab != 'image'"
-        @click="switchTab('image')"
+        v-if="current_tab != 'full'"
+        @click="switchTab('full')"
       >แบบเต็ม</button>
-      <button class="tab-item-active" v-if="current_tab === 'pdf'" @click="switchTab('pdf')">แบบย่อ</button>
-      <button class="tab-item-inactive" v-if="current_tab != 'pdf'" @click="switchTab('pdf')">แบบย่อ</button>
+      <button
+        class="tab-item-active"
+        v-if="current_tab === 'mini'"
+        @click="switchTab('mini')"
+      >แบบย่อ</button>
+      <button
+        class="tab-item-inactive"
+        v-if="current_tab != 'mini'"
+        @click="switchTab('mini')"
+      >แบบย่อ</button>
     </div>
     <div class="tab-view">
-      <div v-if="current_tab === 'image'">
-        <div>
+      <div v-if="current_tab === 'full'">
+        <div class="no-survey-div" v-if="haveResult == false">
+          <h3>ยังไม่มีผลตอบรับจากแบบสอบถาม</h3>
+        </div>
+        <div v-if="haveResult == true">
           <div class="doc-show-area">
             <div class="doc-table-header">
               <h5 class="doc-table-filename">ชื่อ</h5>
               <h5 class="doc-table-farmname">ชื่อฟาร์ม</h5>
               <h5 class="doc-table-date">ส่งวันที่</h5>
             </div>
-            <div class="doc-item" v-for="(data, i) in farmData" :key="i">
+            <div class="doc-item" v-for="(data, i) in surveyFull" :key="i">
               <i class="far fa-file-excel doc-item-icon"></i>
               <h5 class="doc-item-filename">{{data.name}}</h5>
               <h5 class="doc-item-farmname">{{data.farmname}}</h5>
-              <h5 class="doc-item-date">{{data.date}}</h5>
+              <h5 class="doc-item-date">{{data.timestamp}}</h5>
               <button class="doc-delete-btn" @click="deletePdf(i)">
                 <i class="fas fa-trash-alt"></i>
               </button>
             </div>
-            <div class="image-pagination" style="margin-top: 20px;">
+            <div class="survey-pagination" style="margin-top: 20px;">
               <button
                 class="pagination-btn prev-btn"
                 v-if="this.page.now != 1"
@@ -57,81 +68,43 @@
           </div>
         </div>
       </div>
-      <div v-if="current_tab === 'pdf'">
-        <div
-          class="upload-text"
-          style="padding-top:20px;background-color: #fff;padding-left: 20px;"
-        >
-          <i class="fas fa-arrow-up" style="margin-right: 10px;"></i>
-          <h5>อัปโหลดเอกสารใหม่</h5>
+      <div v-if="current_tab === 'mini'">
+        <div class="no-survey-div" v-if="haveResult == false">
+          <h3>ยังไม่มีผลตอบรับจากแบบสอบถาม</h3>
         </div>
-        <div class="lib-toolbar">
-          <div class="upload-panel">
-            <div>
-              <h5>1. เลือกไฟล์</h5>
-              <input
-                ref="pdf_input"
-                type="file"
-                @change="fileChange"
-                accept="application/pdf"
-                :disabled="isUploading"
-              />
+        <div v-if="haveResult == true">
+          <div class="doc-show-area">
+            <div class="doc-table-header">
+              <h5 class="doc-table-filename">ชื่อ</h5>
+              <h5 class="doc-table-farmname">ประเทศ</h5>
+              <h5 class="doc-table-date">ส่งวันที่</h5>
             </div>
-            <div>
-              <h5>2. ตั้งชื่อไฟล์</h5>
-              <input
-                class="upload-name-file"
-                type="text"
-                v-model="filename"
-                :disabled="isUploading"
-              />
-            </div>
-            <div>
-              <h5>3. อัปโหลด</h5>
-              <button
-                class="lib-toolbar-button"
-                :disabled="!file || isUploading"
-                @click="uploadFile('pdf')"
-              >
-                <span>อัปโหลด</span>
-                <i class="fas fa-arrow-up" style="margin-left: 10px;"></i>
+            <div class="doc-item" v-for="(data, i) in surveyMini" :key="i">
+              <i class="far fa-file-excel doc-item-icon"></i>
+              <h5 class="doc-item-filename">{{data.name}}</h5>
+              <h5 class="doc-item-farmname">{{data.country}}</h5>
+              <h5 class="doc-item-date">{{data.timestamp}}</h5>
+              <button class="doc-delete-btn" @click="deletePdf(i)">
+                <i class="fas fa-trash-alt"></i>
               </button>
             </div>
-          </div>
-        </div>
-        <div class="upload-text" style="background-color: #fff;padding-left: 20px;">
-          <i class="fas fa-file-pdf" style="margin-right: 10px;"></i>
-          <h5>เอกสารในคลัง</h5>
-        </div>
-        <div class="doc-show-area">
-          <div class="doc-table-header">
-            <h5 class="doc-table-filename">ชื่อไฟล์</h5>
-            <h5 class="doc-table-date">อัปโหลดวันที่</h5>
-          </div>
-          <div class="doc-item" v-for="(data, i) in documentList" :key="i">
-            <i class="far fa-file-pdf doc-item-icon"></i>
-            <h5 class="doc-item-filename">{{data.filename}}</h5>
-            <h5 class="doc-item-date">{{data.date}}</h5>
-            <button class="doc-delete-btn" @click="deletePdf(i)">
-              <i class="fas fa-trash-alt"></i>
-            </button>
-          </div>
-          <div class="image-pagination" style="margin-top: 20px;">
-            <button
-              class="pagination-btn prev-btn"
-              v-if="this.page.now != 1"
-              @click="prevPage('pdf', page.now);"
-            >
-              <i class="fas fa-arrow-left"></i>
-            </button>
-            <div class="pagination-current">{{page.now}} จาก {{page.all}} หน้า</div>
-            <button
-              class="pagination-btn next-btn"
-              v-if="this.page.now != this.page.all"
-              @click="nextPage('pdf', page.now);"
-            >
-              <i class="fas fa-arrow-right"></i>
-            </button>
+            <div class="survey-pagination" style="margin-top: 20px;">
+              <button
+                class="pagination-btn prev-btn"
+                v-if="this.page.now != 1"
+                @click="prevPage('pdf', page.now);"
+              >
+                <i class="fas fa-arrow-left"></i>
+              </button>
+              <div class="pagination-current">{{page.now}} จาก {{page.all}} หน้า</div>
+              <button
+                class="pagination-btn next-btn"
+                v-if="this.page.now != this.page.all"
+                @click="nextPage('pdf', page.now);"
+              >
+                <i class="fas fa-arrow-right"></i>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -146,7 +119,7 @@ export default {
   name: "library",
   data() {
     return {
-      current_tab: "image",
+      current_tab: "full",
       page: {
         now: 1,
         all: 1
@@ -157,143 +130,64 @@ export default {
       file: null,
       isUploading: false,
       uploadIsOpen: false,
-      farmData: [
-        {
-          name: "นางวรรณภา ใจงาม",
-          farmname: "บ้านผึ้งราชบุรี",
-          date: "12-02-2019"
-        },
-        {
-          name: "นายจงรัก ภักดี",
-          farmname: "บ้านผึ้งราชบุรี สาขา 2",
-          date: "13-02-2019"
-        }
-      ]
+      limit: 10,
+      surveyFull: [],
+      surveyMini: [],
+      haveResult: false
     };
   },
   created() {
-    this.loadFileList(this.current_tab, 1);
+    this.loadSurveyList(this.current_tab, 1);
     this.$emit(`update:layout`, layout_default);
   },
   methods: {
     refreshList: function() {
-      this.loadFileList(this.current_tab);
+      this.loadSurveyList(this.current_tab);
     },
     nextPage: function(target, page) {
       if (this.page.now <= this.page.all) {
         this.page.now = this.page.now + 1;
-        this.loadFileList(target, this.page.now);
+        this.loadSurveyList(target, this.page.now);
       } else {
         this.page.now = this.page.now;
-        this.loadFileList(target, this.page.now);
+        this.loadSurveyList(target, this.page.now);
       }
     },
     prevPage: function(target, page) {
       if (this.page.now <= this.page.all && this.page.now != 0) {
         this.page.now = this.page.now - 1;
-        this.loadFileList(target, this.page.now);
+        this.loadSurveyList(target, this.page.now);
       } else {
         this.page.now = this.page.now;
-        this.loadFileList(target, this.page.now);
+        this.loadSurveyList(target, this.page.now);
       }
     },
     switchTab: function(target) {
       this.current_tab = target;
-      this.loadFileList(target);
+      this.loadSurveyList(target);
     },
-    loadFileList(target, page) {
-      if (target === "pdf" || target === "image") {
-        axios(
-          `/admin/${
-            target === "image" ? "picture" : "pdf"
-          }?page=${page} &limit=10`
-        )
+    loadSurveyList(target, page) {
+      if (target == "full") {
+        axios("admin/survey/full?limit=" + this.limit + "&page=" + page)
           .then(response => {
-            this.page = response.data.page;
-            if (target === "pdf") this.documentList = response.data.file.data;
-            else this.imageList = response.data.file.data;
+            this.surveyFull = response.data.survey.data;
+            this.haveResult = true;
           })
           .catch(error => {
             if (error.response && error.response.data)
-              console.error("get file list", error.response.data.error);
-            else console.error("get file list", error.message);
+              console.error("get survey list", error.response.data.error);
+            else console.error("get survey list", error.message);
           });
-      }
-    },
-    uploadFile(target) {
-      if (this.isUploading) return "";
-      if (target !== "pdf" && target !== "picture") return "";
-      this.isUploading = true;
-      const formData = new FormData();
-      formData.append(target, this.file);
-      formData.append("name", this.filename);
-      axios
-        .post(`/admin/${target}`, formData, {
-          headers: { "Content-Type": "multipart/form-data" }
-        })
-        .then(response => {
-          console.log("file id", response.data.id);
-          this.filename = "";
-          this.file = null;
-          if (target === "picture") {
-            this.imageList.push(response.data);
-            this.$refs.picture_input.value = "";
-            alert("อัปโหลดรูปภาพสำเร็จ");
-            this.loadFileList("image", 1);
-          } else {
-            this.documentList.push(response.data);
-            this.$refs.pdf_input.value = "";
-            alert("อัปโหลดไฟล์ PDF สำเร็จ");
-            this.loadFileList("pdf", 1);
-          }
-        })
-        .catch(error => {
-          if (error.response && error.response.data) {
-            console.error("upload file", error.response.data.error);
-            if (error.response.data.error === "Picture already exists") {
-              alert("เกิดข้อผิดพลาด: อัปโหลดรูปภาพซ้ำ");
-            } else if (error.response.data.error === "No Picture") {
-              alert("เกิดข้อผิดพลาด: ไม่มีรูปภาพ หรือ รูปแบบรูปภาพไม่รองรับ");
-            } else if (error.response.data.error === "PDF already exists") {
-              alert("เกิดข้อผิดพลาด: อัปโหลดไฟล์ PDF ซ้ำ");
-            } else if (error.response.data.error === "No PDF") {
-              alert("เกิดข้อผิดพลาด: ไม่มีไฟล์ PDF หรือ รูปแบบไฟล์ไม่รองรับ");
-            }
-          } else console.error("upload file", error.message);
-        })
-        .finally(() => {
-          this.isUploading = false;
-        });
-    },
-    deleteImage(index) {
-      const image = this.imageList[index];
-      if (confirm(`ยืนยันว่าจะลบรูป ${image.filename}?`)) {
-        axios
-          .delete(`/admin/picture/${image.id}`)
+      } else if (target == "mini") {
+        axios("admin/survey/mini?limit=" + this.limit + "&page=" + page)
           .then(response => {
-            this.imageList.splice(index, 1);
-            this.loadFileList("image", 1);
+            this.surveyMini = response.data.survey.data;
+            this.haveResult = true;
           })
           .catch(error => {
             if (error.response && error.response.data)
-              console.error("delete image", error.response.data.error);
-            else console.error("delete image", error.message);
-          });
-      }
-    },
-    deletePdf(index) {
-      const pdf = this.documentList[index];
-      if (confirm(`ยืนยันว่าจะลบเอกสาร ${pdf.filename}?`)) {
-        axios
-          .delete(`/admin/pdf/${pdf.id}`)
-          .then(response => {
-            this.documentList.splice(index, 1);
-            this.loadFileList("pdf", 1);
-          })
-          .catch(error => {
-            if (error.response && error.response.data)
-              console.error("delete pdf", error.response.data.error);
-            else console.error("delete pdf", error.message);
+              console.error("get survey list", error.response.data.error);
+            else console.error("get survey list", error.message);
           });
       }
     },
@@ -337,7 +231,7 @@ export default {
   position: absolute;
   right: 0;
 }
-.image-pagination {
+.survey-pagination {
   grid-column: span 5;
   grid-row: 3;
   display: flex;
