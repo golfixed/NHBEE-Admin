@@ -4,6 +4,12 @@
       style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:20px;"
     >
       <h1 class="tab-headtext">ผลแบบสอบถาม</h1>
+      <div class="post-toolbar">
+        <div class="toolbar-button" @click="loadSurveyList();">
+          <span>รีเฟรชข้อมูล</span>
+          <i class="fas fa-sync toolbar-btn-icon"></i>
+        </div>
+      </div>
     </div>
     <div class="tab-panel">
       <button
@@ -28,11 +34,20 @@
       >แบบย่อ</button>
     </div>
     <div class="tab-view">
-      <div v-if="current_tab === 'full'">
-        <div class="no-survey-div" v-if="haveResult == false">
-          <h3>ยังไม่มีผลตอบรับจากแบบสอบถาม</h3>
+      <div v-if="current_tab == 'full'">
+        <div class="no-result" v-if="surveyFull.length <= 0 && serverDown == false">
+          <div class="inner-box">
+            <h3>ยังไม่มีผลตอบรับแบบสอบถาม</h3>
+          </div>
         </div>
-        <div v-if="haveResult == true">
+        <div class="no-result" v-if="serverDown == true">
+          <div class="inner-box">
+            <h3>พบปัญหาในการเชื่อมต่อกับ server</h3>
+            <h4>โปรดตรวจสอบการเชื่อมต่ออินเทอร์เน็ต</h4>
+            <h4>หากยังพบปัญหาโปรดติดต่อเจ้าหน้าที่ดูแลระบบ</h4>
+          </div>
+        </div>
+        <div v-if="surveyFull.length > 0">
           <div class="doc-show-area">
             <div class="doc-table-header">
               <h5 class="doc-table-filename">ชื่อ</h5>
@@ -52,7 +67,7 @@
               <button
                 class="pagination-btn prev-btn"
                 v-if="this.page.now != 1"
-                @click="prevPage('pdf', page.now);"
+                @click="prevPage('full', page.now);"
               >
                 <i class="fas fa-arrow-left"></i>
               </button>
@@ -60,7 +75,7 @@
               <button
                 class="pagination-btn next-btn"
                 v-if="this.page.now != this.page.all"
-                @click="nextPage('pdf', page.now);"
+                @click="nextPage('full', page.now);"
               >
                 <i class="fas fa-arrow-right"></i>
               </button>
@@ -68,11 +83,20 @@
           </div>
         </div>
       </div>
-      <div v-if="current_tab === 'mini'">
-        <div class="no-survey-div" v-if="haveResult == false">
-          <h3>ยังไม่มีผลตอบรับจากแบบสอบถาม</h3>
+      <div v-if="current_tab == 'mini'">
+        <div class="no-result" v-if="surveyMini.length <= 0 && serverDown == false">
+          <div class="inner-box">
+            <h3>ยังไม่มีผลตอบรับแบบสอบถาม</h3>
+          </div>
         </div>
-        <div v-if="haveResult == true">
+        <div class="no-result" v-if="serverDown == true">
+          <div class="inner-box">
+            <h3>พบปัญหาในการเชื่อมต่อกับ server</h3>
+            <h4>โปรดตรวจสอบการเชื่อมต่ออินเทอร์เน็ต</h4>
+            <h4>หากยังพบปัญหาโปรดติดต่อเจ้าหน้าที่ดูแลระบบ</h4>
+          </div>
+        </div>
+        <div v-if="surveyMini.length > 0">
           <div class="doc-show-area">
             <div class="doc-table-header">
               <h5 class="doc-table-filename">ชื่อ</h5>
@@ -92,7 +116,7 @@
               <button
                 class="pagination-btn prev-btn"
                 v-if="this.page.now != 1"
-                @click="prevPage('pdf', page.now);"
+                @click="prevPage('mini', page.now);"
               >
                 <i class="fas fa-arrow-left"></i>
               </button>
@@ -100,7 +124,7 @@
               <button
                 class="pagination-btn next-btn"
                 v-if="this.page.now != this.page.all"
-                @click="nextPage('pdf', page.now);"
+                @click="nextPage('mini', page.now);"
               >
                 <i class="fas fa-arrow-right"></i>
               </button>
@@ -116,7 +140,7 @@
 import layout_default from "@/layouts/main.vue";
 import axios from "@/axios.js";
 export default {
-  name: "library",
+  name: "Survey",
   data() {
     return {
       current_tab: "full",
@@ -130,10 +154,10 @@ export default {
       file: null,
       isUploading: false,
       uploadIsOpen: false,
-      limit: 10,
+      limit: 5,
       surveyFull: [],
       surveyMini: [],
-      haveResult: false
+      serverDown: false
     };
   },
   created() {
@@ -170,24 +194,42 @@ export default {
       if (target == "full") {
         axios("admin/survey/full?limit=" + this.limit + "&page=" + page)
           .then(response => {
-            this.surveyFull = response.data.survey.data;
-            this.haveResult = true;
+            if (response.status != 500 || response.status != 404) {
+              this.surveyFull = response.data.survey.data;
+              this.page.now = response.data.page.now;
+              this.page.all = response.data.page.all;
+            } else {
+              this.surveyFull = this.surveyFull;
+            }
           })
           .catch(error => {
-            if (error.response && error.response.data)
+            if (error.response && error.response.data) {
               console.error("get survey list", error.response.data.error);
-            else console.error("get survey list", error.message);
+              this.serverDown = true;
+            } else {
+              console.error("get survey list", error.message);
+              this.serverDown = true;
+            }
           });
       } else if (target == "mini") {
         axios("admin/survey/mini?limit=" + this.limit + "&page=" + page)
           .then(response => {
-            this.surveyMini = response.data.survey.data;
-            this.haveResult = true;
+            if (response.status != 500 || response.status != 404) {
+              this.surveyMini = response.data.survey.data;
+              this.page.now = response.data.page.now;
+              this.page.all = response.data.page.all;
+            } else {
+              this.surveyMini = this.surveyMini;
+            }
           })
           .catch(error => {
-            if (error.response && error.response.data)
+            if (error.response && error.response.data) {
               console.error("get survey list", error.response.data.error);
-            else console.error("get survey list", error.message);
+              this.serverDown = true;
+            } else {
+              console.error("get survey list", error.message);
+              this.serverDown = true;
+            }
           });
       }
     },
@@ -201,6 +243,18 @@ export default {
 </script>
 
 <style scoped>
+.no-result {
+  height: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #aaaaaa;
+  background-color: #fff;
+}
+.no-result > div.inner-box {
+  text-align: center;
+  cursor: default;
+}
 .prev-btn,
 .next-btn {
   border: 0;
@@ -466,5 +520,25 @@ export default {
   background-color: #eaeaea;
   padding-left: 10px;
   outline: none;
+}
+.toolbar-button {
+  width: fit-content;
+  height: 30px;
+  background-color: #fff;
+  /* border-radius: 5px;
+  border: 1px solid grey; */
+  font-size: 15px;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  transition: all 0.1s;
+}
+.toolbar-button:hover {
+  background-color: rgb(220, 220, 220);
+  transition: all 0.1s;
+  cursor: pointer;
+}
+.toolbar-btn-icon {
+  margin-left: 10px;
 }
 </style>

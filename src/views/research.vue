@@ -5,6 +5,10 @@
     >
       <h1 class="tab-headtext">งานวิจัย</h1>
       <div class="post-toolbar">
+        <div class="toolbar-button" @click="ftSearch();" style="margin-right: 10px;">
+          <span>รีเฟรชข้อมูล</span>
+          <i class="fas fa-sync toolbar-btn-icon"></i>
+        </div>
         <div class="toolbar-button" @click="newResearch();">
           <span>รายการงานวิจัยใหม่</span>
           <i class="fas fa-edit toolbar-btn-icon"></i>
@@ -12,13 +16,47 @@
       </div>
     </div>
     <div class="post-view">
-      <div class="searchbox-div">
+      <div class="searchbox-div" v-if="dataList.length > 0 || isSearch == true">
         <div class="form-set">
           <p class="form-set-label">ค้นหาด้วยชื่อ</p>
           <input v-model="search" class="form-set-input" type="text" @keypress.enter="getResearch" />
         </div>
+        <i class="fas fa-search" v-if="search == ''"></i>
+        <i class="fas fa-times" v-on:click="clearSearch(); " v-if="search != ''"></i>
       </div>
-      <div>
+      <div class="no-result">
+        <div
+          class="inner-box"
+          v-if="dataList.length <= 0 && isLoading == false && isSearch == true"
+        >
+          <div>
+            <h3>ไม่พบผลลัพธ์</h3>
+            <h4>โปรดลองใช้คำค้นหาอื่น</h4>
+          </div>
+        </div>
+        <div
+          class="inner-box"
+          v-if="isLoading == false && dataList.length <= 0 && isSearch == false"
+        >
+          <div>
+            <h3>ยังไม่มีงานวิจัยในระบบ</h3>
+            <h4>
+              คลิก รายการงานวิจัยใหม่
+              <i
+                class="fas fa-edit toolbar-btn-icon"
+                style="margin:0 5px 0 5px;"
+              ></i>เพื่อเริ่มสร้างรายการใหม่
+            </h4>
+          </div>
+        </div>
+        <div class="inner-box" v-if="isLoading == true">
+          <div>
+            <h3>กำลังโหลด</h3>
+            <h4>โปรดรอสักครู่</h4>
+          </div>
+        </div>
+      </div>
+      <div v-if="dataList.length > 0 && isLoading == false">
         <table style="width: 100%;">
           <thead>
             <tr style="height:30px;">
@@ -28,7 +66,11 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(research, index) in dataList" :key="'research_' + research.id" class="research-list">
+            <tr
+              v-for="(research, index) in dataList"
+              :key="'research_' + research.id"
+              class="research-list"
+            >
               <td>
                 <div class="research-list-title">{{ research.th.title }} ({{ research.en.title }})</div>
               </td>
@@ -65,7 +107,7 @@
       </div>
     </div>
     <div class="newpost-window" v-if="isOpenNewPost === true">
-      <research-editor :newPostClose="newPostClose" :researchId="researchId"/>
+      <research-editor :newPostClose="newPostClose" :researchId="researchId" />
     </div>
   </div>
 </template>
@@ -91,24 +133,30 @@ export default {
         now: 1,
         all: 0
       },
-      researchId: null
+      researchId: null,
+      isSearch: false
     };
   },
   created() {
-    this.getResearch();
+    // this.getResearch();
+    this.ftSearch();
     this.$emit(`update:layout`, layout_default);
   },
   methods: {
-    getResearch(page = 1) {
+    clearSearch: function() {
+      this.search = "";
+      this.getResearch();
+      this.isLoading = true;
+    },
+    ftSearch(page = 1) {
+      this.isSearch = false;
       if (this.isLoading) return "";
       this.isLoading = true;
-      axios(
-        `/admin/research?limit=${this.limit}&page=${page}&q=${this.search}`
-      )
+      axios(`/admin/research?limit=${this.limit}&page=${page}&q=${this.search}`)
         .then(response => {
           const data = response.data;
           this.dataList = data.research.data;
-          this.page = data.page
+          this.page = data.page;
         })
         .catch(error => {
           if (error.response && error.response.data)
@@ -119,13 +167,32 @@ export default {
           this.isLoading = false;
         });
     },
+    getResearch(page = 1) {
+      if (this.isLoading) return "";
+      this.isLoading = true;
+      axios(`/admin/research?limit=${this.limit}&page=${page}&q=${this.search}`)
+        .then(response => {
+          const data = response.data;
+          this.dataList = data.research.data;
+          this.page = data.page;
+        })
+        .catch(error => {
+          if (error.response && error.response.data)
+            console.error("get research", error.response.data.error);
+          else console.error("get research", error.message);
+        })
+        .finally(() => {
+          this.isLoading = false;
+          this.isSearch = true;
+        });
+    },
     editResearch(id) {
-      this.researchId = id
-      this.newPostOpen()
+      this.researchId = id;
+      this.newPostOpen();
     },
     newResearch() {
-      this.researchId = null
-      this.newPostOpen()
+      this.researchId = null;
+      this.newPostOpen();
     },
     newPostOpen: function() {
       this.isOpenNewPost = true;
@@ -146,19 +213,21 @@ export default {
         this.page.now = 1;
       }
     },
-    deleteResearch: function (index = -1) {
-      if (!this.dataList[index]) return ''
+    deleteResearch: function(index = -1) {
+      if (!this.dataList[index]) return "";
       if (confirm(`ยืนยันการลบงานวิจัยนี้?`)) {
         axios({
-          method: 'delete',
+          method: "delete",
           url: `/admin/research/${this.dataList[index].id}`
-        }).then(() => {
-          this.dataList.splice(index, 1)
-        }).catch(error => {
-          if (error.response && error.response.data)
-            console.error("patch news", error.response.data.error);
-          else console.error("patch news", error.message);
         })
+          .then(() => {
+            this.dataList.splice(index, 1);
+          })
+          .catch(error => {
+            if (error.response && error.response.data)
+              console.error("patch news", error.response.data.error);
+            else console.error("patch news", error.message);
+          });
       }
     }
   }
@@ -166,6 +235,32 @@ export default {
 </script>
 
 <style>
+.no-result {
+  color: #aaaaaa;
+}
+.no-result > div.inner-box {
+  text-align: center;
+  cursor: default;
+  height: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.no-result > div.inner-box > div {
+  text-align: center;
+}
+.searchbox-div > i {
+  font-size: 15px;
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translate(-10px, -50%);
+  color: #aaaaaa;
+}
+.searchbox-div > i:hover {
+  color: grey;
+  cursor: pointer;
+}
 .research-list-title {
   display: -webkit-box;
   -webkit-line-clamp: 1;
@@ -237,9 +332,9 @@ export default {
 }
 .post-view {
   background-color: #ffffff;
-  border: solid grey;
-  border-width: 1px;
-  border-radius: 5px;
+  /* border: solid grey; */
+  /* border-width: 1px; */
+  /* border-radius: 5px; */
   padding: 20px;
 }
 .section-title {
@@ -248,6 +343,7 @@ export default {
 .searchbox-div {
   border: solid #aaaaaa;
   border-width: 0;
+  position: relative;
 }
 .form-set {
   display: flex;
@@ -261,8 +357,8 @@ export default {
 .form-set-input {
   width: 100%;
   min-height: 30px;
-  border-radius: 5px;
-  border: 1px solid #aaaaaa;
+  /* border-radius: 5px;
+  border: 1px solid #aaaaaa; */
 }
 .post-toolbar {
   display: flex;
@@ -271,8 +367,8 @@ export default {
   width: fit-content;
   height: 30px;
   background-color: #fff;
-  border-radius: 5px;
-  border: 1px solid grey;
+  /* border-radius: 5px;
+  border: 1px solid grey; */
   font-size: 15px;
   padding: 0 20px;
   display: flex;

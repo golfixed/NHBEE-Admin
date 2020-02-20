@@ -4,6 +4,12 @@
       style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:20px;"
     >
       <h1 class="tab-headtext">Homeslide</h1>
+      <div class="post-toolbar">
+        <div class="toolbar-button" @click="loadFileList();">
+          <span>รีเฟรชข้อมูล</span>
+          <i class="fas fa-sync toolbar-btn-icon"></i>
+        </div>
+      </div>
     </div>
     <div class="tab-view">
       <div>
@@ -43,7 +49,15 @@
           <i class="far fa-images" style="margin-right: 10px;"></i>
           <h5>รูปภาพในระบบตอนนี้</h5>
         </div>
-        <div class="image-show-area">
+        <div class="no-result" v-if="imageList.length <= 0">
+          <div class="inner-box">
+            <div>
+              <h3>ยังไม่มีรูปภาพในระบบตอนนี้</h3>
+              <h4>เริ่มต้นอัปโหลดรูปภาพใหม่ที่เครื่องมืออัปโหลดด้านบน</h4>
+            </div>
+          </div>
+        </div>
+        <div class="image-show-area" v-if="imageList.length > 0">
           <div class="image-item" v-for="(data, i) in imageList" :key="i">
             <img class="image-item-img" :src="data.url" />
             <h5 class="image-item-filename">{{data.id}}</h5>
@@ -119,9 +133,7 @@ export default {
       }
     },
     loadFileList(page) {
-      axios(
-        `/admin/carousel?page=${page}&limit=10`
-      )
+      axios(`/admin/carousel?page=${page}&limit=10`)
         .then(response => {
           this.page = response.data.page;
           this.imageList = response.data.carousel.data;
@@ -194,6 +206,21 @@ export default {
 </script>
 
 <style scoped>
+.no-result {
+  color: #aaaaaa;
+  background-color: #fff;
+}
+.no-result > div.inner-box {
+  text-align: center;
+  cursor: default;
+  height: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.no-result > div.inner-box > div {
+  text-align: center;
+}
 .prev-btn,
 .next-btn {
   border: 0;
@@ -453,5 +480,25 @@ export default {
   background-color: #eaeaea;
   padding-left: 10px;
   outline: none;
+}
+.toolbar-button {
+  width: fit-content;
+  height: 30px;
+  background-color: #fff;
+  /* border-radius: 5px;
+  border: 1px solid grey; */
+  font-size: 15px;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  transition: all 0.1s;
+}
+.toolbar-button:hover {
+  background-color: rgb(220, 220, 220);
+  transition: all 0.1s;
+  cursor: pointer;
+}
+.toolbar-btn-icon {
+  margin-left: 10px;
 }
 </style>

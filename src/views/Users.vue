@@ -222,26 +222,6 @@ export default {
 </script>
 
 <style scoped>
-.toolbar-button {
-  width: fit-content;
-  height: 30px;
-  background-color: #fff;
-  border-radius: 5px;
-  border: 1px solid grey;
-  font-size: 15px;
-  padding: 0 20px;
-  display: flex;
-  align-items: center;
-  transition: all 0.1s;
-}
-.toolbar-button:hover {
-  background-color: rgb(220, 220, 220);
-  transition: all 0.1s;
-  cursor: pointer;
-}
-.toolbar-btn-icon {
-  margin-left: 10px;
-}
 table {
   width: 100%;
   padding: 20px;
@@ -279,5 +259,25 @@ table > tr > th {
 }
 .input-item > h4 {
   width: 200px;
+}
+.toolbar-button {
+  width: fit-content;
+  height: 30px;
+  background-color: #fff;
+  /* border-radius: 5px;
+  border: 1px solid grey; */
+  font-size: 15px;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  transition: all 0.1s;
+}
+.toolbar-button:hover {
+  background-color: rgb(220, 220, 220);
+  transition: all 0.1s;
+  cursor: pointer;
+}
+.toolbar-btn-icon {
+  margin-left: 10px;
 }
 </style>

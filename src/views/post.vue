@@ -5,6 +5,10 @@
     >
       <h1 class="tab-headtext">บทความ</h1>
       <div class="post-toolbar">
+        <div class="toolbar-button" @click="ftSearch();" style="margin-right: 10px;">
+          <span>รีเฟรชข้อมูล</span>
+          <i class="fas fa-sync toolbar-btn-icon"></i>
+        </div>
         <div class="toolbar-button" @click="newPost();">
           <span>บทความใหม่</span>
           <i class="fas fa-edit toolbar-btn-icon"></i>
@@ -12,13 +16,44 @@
       </div>
     </div>
     <div class="post-view">
-      <div class="searchbox-div">
+      <div class="searchbox-div" v-if="dataList.length > 0 || isSearch == true">
         <div class="form-set">
           <p class="form-set-label">ค้นหาด้วยชื่อ</p>
           <input v-model="search" class="form-set-input" type="text" @keypress.enter="getNews" />
         </div>
+        <i class="fas fa-search" v-if="search == ''"></i>
+        <i class="fas fa-times" v-on:click="clearSearch(); " v-if="search != ''"></i>
       </div>
-      <div>
+      <div class="no-result">
+        <div
+          class="inner-box"
+          v-if="dataList.length <= 0 && isLoading == false && isSearch == true"
+        >
+          <div>
+            <h3>ไม่พบผลลัพธ์</h3>
+            <h4>โปรดลองใช้คำค้นหาอื่น</h4>
+          </div>
+        </div>
+        <div
+          class="inner-box"
+          v-if="isLoading == false && dataList.length <= 0 && isSearch == false"
+        >
+          <div>
+            <h3>ยังไม่มีบทความในระบบ</h3>
+            <h4>
+              คลิก บทความใหม่
+              <i class="fas fa-edit toolbar-btn-icon" style="margin:0 5px 0 5px;"></i>เพื่อเริ่มสร้างบทความใหม่
+            </h4>
+          </div>
+        </div>
+        <div class="inner-box" v-if="isLoading == true">
+          <div>
+            <h3>กำลังโหลด</h3>
+            <h4>โปรดรอสักครู่</h4>
+          </div>
+        </div>
+      </div>
+      <div v-if="dataList.length > 0 && isLoading == false">
         <table style="width: 100%;">
           <thead>
             <tr style="height: 30px;">
@@ -67,7 +102,7 @@
       </div>
     </div>
     <div class="newpost-window" v-if="isOpenNewPost === true">
-      <post-editor :newPostClose="newPostClose" :news-id="newsId"/>
+      <post-editor :newPostClose="newPostClose" :news-id="newsId" />
     </div>
   </div>
 </template>
@@ -93,24 +128,30 @@ export default {
         now: 1,
         all: 1
       },
-      newsId: null
+      newsId: null,
+      isSearch: false
     };
   },
   created() {
-    this.getNews();
+    // this.getNews();
+    this.ftSearch();
     this.$emit(`update:layout`, layout_default);
   },
   methods: {
-    getNews(page = 1) {
+    clearSearch: function() {
+      this.search = "";
+      this.getNews();
+      this.isLoading = true;
+    },
+    ftSearch(page = 1) {
+      this.isSearch = false;
       if (this.isLoading) return "";
       this.isLoading = true;
-      axios(
-        `/admin/news?limit=${this.limit}&page=${page}&q=${this.search}`
-      )
+      axios(`/admin/news?limit=${this.limit}&page=${page}&q=${this.search}`)
         .then(response => {
           const data = response.data;
           this.dataList = data.news.data;
-          this.page = data.page
+          this.page = data.page;
         })
         .catch(error => {
           if (error.response && error.response.data)
@@ -121,13 +162,32 @@ export default {
           this.isLoading = false;
         });
     },
+    getNews(page = 1) {
+      if (this.isLoading) return "";
+      this.isLoading = true;
+      axios(`/admin/news?limit=${this.limit}&page=${page}&q=${this.search}`)
+        .then(response => {
+          const data = response.data;
+          this.dataList = data.news.data;
+          this.page = data.page;
+        })
+        .catch(error => {
+          if (error.response && error.response.data)
+            console.error("get news", error.response.data.error);
+          else console.error("get news", error.message);
+        })
+        .finally(() => {
+          this.isLoading = false;
+          this.isSearch = true;
+        });
+    },
     editPost(id) {
-      this.newsId = id
-      this.newPostOpen()
+      this.newsId = id;
+      this.newPostOpen();
     },
     newPost() {
-      this.newsId = null
-      this.newPostOpen()
+      this.newsId = null;
+      this.newPostOpen();
     },
     newPostOpen: function() {
       this.isOpenNewPost = true;
@@ -148,23 +208,25 @@ export default {
         this.page.now = 1;
       }
     },
-    publish: function (index = -1, status = false) {
-      if (!this.dataList[index]) return ''
-      const news = this.dataList[index]
-      if (confirm(`ยืนยันการ ${status ? 'เผยแพร่' : 'ซ่อน'} บทความนี้?`)) {
+    publish: function(index = -1, status = false) {
+      if (!this.dataList[index]) return "";
+      const news = this.dataList[index];
+      if (confirm(`ยืนยันการ ${status ? "เผยแพร่" : "ซ่อน"} บทความนี้?`)) {
         axios({
-          method: 'patch',
-          url: `/admin/news/${news.id}/${status ? '' : 'un'}publish`
-        }).then(() => {
-          const data = this.dataList[index]
-          this.dataList[index] = null
-          data.status = !!status
-          this.dataList[index] = data
-        }).catch(error => {
-          if (error.response && error.response.data)
-            console.error("patch news", error.response.data.error);
-          else console.error("patch news", error.message);
+          method: "patch",
+          url: `/admin/news/${news.id}/${status ? "" : "un"}publish`
         })
+          .then(() => {
+            const data = this.dataList[index];
+            this.dataList[index] = null;
+            data.status = !!status;
+            this.dataList[index] = data;
+          })
+          .catch(error => {
+            if (error.response && error.response.data)
+              console.error("patch news", error.response.data.error);
+            else console.error("patch news", error.message);
+          });
       }
     }
   }
@@ -172,6 +234,32 @@ export default {
 </script>
 
 <style>
+.no-result {
+  color: #aaaaaa;
+}
+.no-result > div.inner-box {
+  text-align: center;
+  cursor: default;
+  height: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.no-result > div.inner-box > div {
+  text-align: center;
+}
+.searchbox-div > i {
+  font-size: 15px;
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translate(-10px, -50%);
+  color: #aaaaaa;
+  cursor: pointer;
+}
+.searchbox-div > i:hover {
+  color: grey;
+}
 .news-list-title {
   display: -webkit-box;
   -webkit-line-clamp: 1;
@@ -243,9 +331,9 @@ export default {
 }
 .post-view {
   background-color: #ffffff;
-  border: solid grey;
+  /* border: solid grey;
   border-width: 1px;
-  border-radius: 5px;
+  border-radius: 5px; */
   padding: 20px;
 }
 .section-title {
@@ -254,6 +342,7 @@ export default {
 .searchbox-div {
   border: solid #aaaaaa;
   border-width: 0;
+  position: relative;
 }
 .form-set {
   display: flex;
@@ -267,18 +356,24 @@ export default {
 .form-set-input {
   width: 100%;
   min-height: 30px;
-  border-radius: 5px;
-  border: 1px solid #aaaaaa;
+  /* border-radius: 5px;
+  border: 1px solid #aaaaaa; */
 }
 .post-toolbar {
   display: flex;
+}
+.globe-publish {
+  color: green;
+}
+.globe-unpublish {
+  color: grey;
 }
 .toolbar-button {
   width: fit-content;
   height: 30px;
   background-color: #fff;
-  border-radius: 5px;
-  border: 1px solid grey;
+  /* border-radius: 5px;
+  border: 1px solid grey; */
   font-size: 15px;
   padding: 0 20px;
   display: flex;
@@ -292,11 +387,5 @@ export default {
 }
 .toolbar-btn-icon {
   margin-left: 10px;
-}
-.globe-publish {
-  color: green;
-}
-.globe-unpublish {
-  color: grey;
 }
 </style>

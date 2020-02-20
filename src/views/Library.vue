@@ -4,6 +4,12 @@
       style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:20px;"
     >
       <h1 class="tab-headtext">คลังรูปภาพ และ เอกสารPDF</h1>
+      <div class="post-toolbar">
+        <div class="toolbar-button" @click="loadSurveyList();">
+          <span>รีเฟรชข้อมูล</span>
+          <i class="fas fa-sync toolbar-btn-icon"></i>
+        </div>
+      </div>
     </div>
     <div class="tab-panel">
       <button
@@ -75,7 +81,17 @@
             <i class="far fa-images" style="margin-right: 10px;"></i>
             <h5>รูปภาพในคลัง</h5>
           </div>
-          <div class="image-show-area">
+          <div class="no-result" v-if="imageList.length <= 0">
+            <div class="inner-box">
+              <div>
+                <h3>ยังไม่มีรูปภาพในระบบตอนนี้</h3>
+                <h4>
+                  <i class="fas fa-arrow-up toolbar-btn-icon" style="margin:0 5px 0 0;"></i>เริ่มต้นอัปโหลดรูปภาพใหม่ที่เครื่องมืออัปโหลดด้านบน
+                </h4>
+              </div>
+            </div>
+          </div>
+          <div class="image-show-area" v-if="imageList.length > 0">
             <div class="image-item" v-for="(data, i) in imageList" :key="i">
               <img class="image-item-img" :src="data.pictureURL" />
               <h5 class="image-item-filename">{{data.filename}}</h5>
@@ -149,7 +165,17 @@
           <i class="fas fa-file-pdf" style="margin-right: 10px;"></i>
           <h5>เอกสารในคลัง</h5>
         </div>
-        <div class="doc-show-area">
+        <div class="no-result" v-if="documentList.length <= 0">
+          <div class="inner-box">
+            <div>
+              <h3>ยังไม่มีเอกสาร PDF ในระบบตอนนี้</h3>
+              <h4>
+                <i class="fas fa-arrow-up toolbar-btn-icon" style="margin:0 5px 0 0;"></i>เริ่มต้นอัปโหลดเอกสารใหม่ที่เครื่องมืออัปโหลดด้านบน
+              </h4>
+            </div>
+          </div>
+        </div>
+        <div class="doc-show-area" v-if="documentList.length > 0">
           <div class="doc-table-header">
             <h5 class="doc-table-filename">ชื่อไฟล์</h5>
             <h5 class="doc-table-date">อัปโหลดวันที่</h5>
@@ -341,6 +367,18 @@ export default {
 </script>
 
 <style scoped>
+.no-result {
+  color: #aaaaaa;
+  background-color: #fff;
+}
+.no-result > div.inner-box {
+  text-align: center;
+  cursor: default;
+  height: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 .prev-btn,
 .next-btn {
   border: 0;
@@ -600,5 +638,25 @@ export default {
   background-color: #eaeaea;
   padding-left: 10px;
   outline: none;
+}
+.toolbar-button {
+  width: fit-content;
+  height: 30px;
+  background-color: #fff;
+  /* border-radius: 5px;
+  border: 1px solid grey; */
+  font-size: 15px;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  transition: all 0.1s;
+}
+.toolbar-button:hover {
+  background-color: rgb(220, 220, 220);
+  transition: all 0.1s;
+  cursor: pointer;
+}
+.toolbar-btn-icon {
+  margin-left: 10px;
 }
 </style>
