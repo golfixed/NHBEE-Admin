@@ -1,38 +1,66 @@
 <template>
-  <div style="padding: 20px;">
+  <div class="popup-window">
     <div class="control-tab">
-      <h3 class="window-headtext">{{ saveId ? 'แก้ไขผลงานวิจัย' : 'ผลงานวิจัยใหม่' }}</h3>
-      <i @click="newPostClose();" class="fas fa-times close-btn"></i>
+      <h3 class="window-headtext">
+        {{ saveId ? 'แก้ไขรายการงานวิจัย' : 'รายการงานวิจัยใหม่' }}
+        <i
+          class="fas fa-edit popup-btn-icon"
+        ></i>
+      </h3>
+      <hr class="section-hr" style="margin: 10px 0 30px 0" />
     </div>
-    <div class="tab-panel">
-      <button class="tab-item-active" v-if="current_tab === 'th'" @click="switchTab('th')">ภาษาไทย</button>
-      <button class="tab-item-inactive" v-if="current_tab != 'th'" @click="switchTab('th')">ภาษาไทย</button>
-      <button class="tab-item-active" v-if="current_tab === 'en'" @click="switchTab('en')">English</button>
-      <button class="tab-item-inactive" v-if="current_tab != 'en'" @click="switchTab('en')">English</button>
+    <div class="popup-display">
+      <div>
+        <div class="thai-post-box">
+          <h4>ชื่อ (ภาษาไทย)</h4>
+          <input v-model="th.title" placeholder="ตัวอย่าง: ผึ้งหลวงเป็นผึ้งของไทย" />
+          <h4>Title (English)</h4>
+          <input v-model="en.title" placeholder="Example: How bumble bee can fly." />
+        </div>
+      </div>
+      <div>
+        <p v-if="pdfId">ไฟล์ PDF ที่เลือก</p>
+        <div class="selected-pdf" v-if="pdfId">
+          <p v-text="pdfFilename"></p>
+          <i class="fas fa-edit" v-on:click="clearPDFSelect();"></i>
+        </div>
+        <p v-else>เลือกไฟล์ PDF</p>
+        <select-pdf v-if="pdfId == null" v-model="pdfId" :filename.sync="pdfFilename" />
+      </div>
     </div>
-    <h1>{{current_tab}}</h1>
-    <div v-if="current_tab === 'th'" class="thai-post-box">
-      <input v-model="th.title" placeholder="Title"/>
-    </div>
-    <div v-if="current_tab === 'en'" class="thai-post-box">
-      <input v-model="en.title" placeholder="Title"/>
-    </div>
-    <div>
-      <p v-if="pdfId" v-text="pdfFilename"></p>
-      <p v-else>เลือกไฟล์ PDF</p>
-      <select-pdf v-model="pdfId" :filename.sync="pdfFilename"/>
-      <button @click="savePost" :disabled="isLoadinig">Save</button>
+    <hr class="section-hr" style="margin-top: 20px;" />
+    <div class="popup-btn-panel">
+      <div class="left-group">
+        <div
+          class="popup-button popup-button-cancel"
+          @click="newPostClose();"
+          :disabled="isLoading"
+        >
+          <span>ยกเลิก</span>
+          <i class="fas fa-times popup-btn-icon"></i>
+        </div>
+      </div>
+      <div class="right-group">
+        <div class="popup-button popup-button-clear" @click="clearPost();" :disabled="isLoading">
+          <span>ล้างทั้งหมด</span>
+          <i class="fas fa-eraser popup-btn-icon"></i>
+        </div>
+        <div class="popup-button popup-button-submit" @click="savePost();" :disabled="isLoading">
+          <span>บันทึกข้อมูล</span>
+          <i class="fas fa-save popup-btn-icon"></i>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 <script>
-import axios from '@/axios.js'
-import selectpdf from '@/components/selectpdf.vue'
+import axios from "@/axios.js";
+import selectpdf from "@/components/selectpdf.vue";
 
 export default {
   name: "research-editor",
   components: {
-    'select-pdf': selectpdf
+    "select-pdf": selectpdf
   },
   data() {
     return {
@@ -46,93 +74,118 @@ export default {
       pdfId: null,
       pdfFilename: "",
       saveId: null,
-      isLoadinig: false
+      isLoading: false,
+      clearConfirm: false
     };
   },
   props: {
     newPostClose: Function,
     researchId: Number
   },
-  created () {
-    this.getPost(this.researchId)
+  created() {
+    this.getPost(this.researchId);
   },
   watch: {
-    researchId (value) {
-      this.getPost(value)
+    researchId(value) {
+      this.getPost(value);
     }
   },
   methods: {
-    switchTab: function(target) {
-      this.current_tab = target;
+    clearPDFSelect() {
+      this.pdfId = null;
     },
-    clearPost () {
+    clearPost() {
       this.th = {
         title: ""
-      }
+      };
       this.en = {
         title: ""
-      }
-      this.pdfId = null
-      this.pdfFilename = ""
-      this.saveId = null
+      };
+      this.pdfId = null;
+      this.pdfFilename = "";
+      this.saveId = null;
     },
-    getPost (researchId) {
-      if (!researchId) return this.clearPost()
-      axios.get(`/admin/research/${this.researchId}`).then(response => {
-        const data = response.data
-        this.th = data.th
-        this.en = data.en
-        this.pdfId = data.pdfId
-        this.pdfFilename = data.pdfFilename
-        this.saveId = data.id
-      }).catch(error => {
-        if (error.response && error.response.data)
-          console.error("get research", error.response.data.error)
-        else console.error("get research", error.message)
-        this.clearPost()
-      })
+    getPost(researchId) {
+      if (!researchId) return this.clearPost();
+      axios
+        .get(`/admin/research/${this.researchId}`)
+        .then(response => {
+          const data = response.data;
+          this.th = data.th;
+          this.en = data.en;
+          this.pdfId = data.pdfId;
+          this.pdfFilename = data.pdfFilename;
+          this.saveId = data.id;
+        })
+        .catch(error => {
+          if (error.response && error.response.data)
+            console.error("get research", error.response.data.error);
+          else console.error("get research", error.message);
+          this.clearPost();
+        });
     },
-    savePost () {
-      if (this.isLoadinig) return ''
-      this.isLoadinig = true
-      const sendData = {
-        th: this.th,
-        en: this.en,
-        pdfId: this.pdfId
-      }
+    savePost() {
+      if (this.isLoading) return "";
+      this.isLoading = true;
 
-      axios({
-        url: `/admin/research${this.saveId ? '/' + this.saveId : ''}`,
-        method: this.saveId ? 'put' : 'post',
-        data: sendData
-      }).then(response => {
-        this.clearPost()
-        this.newPostClose()
-        // alert('Research ID: ' + response.data.id)
-      }).catch(error => {
-        if (error.response && error.response.data)
-          console.error("save research", error.response.data.error)
-        else console.error("save research", error.message)
-      }).finally(() => {
-        this.isLoadinig = false
-      })
+      if (this.en.title == "" || this.th.title == "") {
+        alert("โปรดกรอกข้อมูลให้ครบถ้วน");
+      } else if (this.pdfId == null) {
+        alert("โปรดเลือกไฟล์ PDF");
+      } else {
+        const sendData = {
+          th: this.th,
+          en: this.en,
+          pdfId: this.pdfId
+        };
+
+        axios({
+          url: `/admin/research${this.saveId ? "/" + this.saveId : ""}`,
+          method: this.saveId ? "put" : "post",
+          data: sendData
+        })
+          .then(response => {
+            this.clearPost();
+            // alert('Research ID: ' + response.data.id)
+          })
+          .catch(error => {
+            if (error.response && error.response.data)
+              console.error("save research", error.response.data.error);
+            else console.error("save research", error.message);
+          })
+          .finally(() => {
+            this.isLoading = false;
+            alert("บันทึกข้อมูลสำเร็จ");
+            this.newPostClose();
+          });
+      }
     }
   }
 };
 </script>
 <style scoped>
-.control-tab {
-  display: flex;
-  position: relative;
+.popup-window {
+  padding: 30px;
+  width: 600px;
 }
-.close-btn {
-  position: absolute;
-  right: 0;
-  top: 0;
+.thai-post-box > input {
+  background-color: #f1f1f1;
+  border: 0;
+  width: calc(100% - 10px);
+  height: 30px;
+  font-size: 14px;
+  margin: 5px 0 20px 0;
+  padding-left: 10px;
+}
+.thai-post-box > input::placeholder,
+.thai-post-box > input::-webkit-input-placeholder {
+  padding-left: 10px;
+}
+.control-tab {
+  display: block;
 }
 .window-headtext {
   font-size: 25px;
-  padding-bottom: 15px;
   margin: 0;
 }
 .tab-headtext {
@@ -160,5 +213,82 @@ export default {
   font-size: 15px;
   outline: none;
   padding: 0 40px;
+}
+.section-hr {
+  border: 1px solid #ececec;
+}
+.popup-button {
+  width: fit-content;
+  height: 30px;
+  background-color: #ececec;
+  font-size: 15px;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  transition: all 0.1s;
+  margin-right: 10px;
+  user-select: none;
+}
+.popup-button:hover {
+  background-color: rgb(220, 220, 220);
+  transition: all 0.1s;
+  cursor: pointer;
+  color: #fff;
+}
+.popup-btn-panel {
+  display: grid;
+  grid-template-columns: repeat(2, 50%);
+  margin-top: 20px;
+}
+.left-group {
+  display: flex;
+  justify-content: flex-start;
+}
+.right-group {
+  display: flex;
+  justify-content: flex-end;
+}
+.right-group > div.popup-button:last-child {
+  margin-right: 0;
+}
+
+.left-group,
+.right-group {
+  display: flex;
+  position: relative;
+}
+
+.popup-button-cancel:hover {
+  background-color: rgb(163, 163, 163);
+}
+.popup-button-clear:hover {
+  background-color: rgb(255, 111, 111);
+}
+.popup-button-submit:hover {
+  background-color: rgb(55, 199, 120);
+}
+.popup-btn-icon {
+  margin-left: 10px;
+}
+
+.selected-pdf > p {
+  background-color: #f1f1f1;
+  height: 32px;
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
+  padding-left: 10px;
+}
+.selected-pdf > i {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translate(0, -50%);
+}
+.selected-pdf > i:hover {
+  color: grey;
+}
+.selected-pdf {
+  position: relative;
 }
 </style>

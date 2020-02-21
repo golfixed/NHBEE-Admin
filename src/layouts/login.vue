@@ -1,7 +1,7 @@
 <template>
   <div class="login-body">
     <div class="login-dialog" style="text-align: center;">
-      <img class="login-logo" src="/img/PNG/logo.png" />
+      <img class="login-logo" src="/logo.png" />
       <h2 class="login-title">เข้าโหมดผู้ดูแลระบบ</h2>
       <h2 class="login-desc">NHBEE KMUTT</h2>
       <div style="margin-top: 10px;">

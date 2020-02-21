@@ -219,7 +219,7 @@ export default {
   created() {
     if (this.isLoggedIn) {
       this.$emit(`update:layout`, layout_default);
-      // this.getAnalyticData();
+      this.getAnalyticData();
     } else this.$emit(`update:layout`, layout_login);
   },
   watch: {
@@ -237,7 +237,8 @@ export default {
   },
   methods: {
     getAnalyticData() {
-      axios.get("/admin/dashboard/analytic")
+      axios
+        .get("http://nhbee.kmutt.ac.th/admin/dashboard/analytic")
         .then(response => {
           this.analyticData = response.data;
         })

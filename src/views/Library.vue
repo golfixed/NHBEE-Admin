@@ -4,11 +4,19 @@
       style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:20px;"
     >
       <h1 class="tab-headtext">คลังรูปภาพ และ เอกสารPDF</h1>
-      <div class="post-toolbar">
+      <div class="top-toolbar">
         <div class="toolbar-button" @click="loadSurveyList();">
           <span>รีเฟรชข้อมูล</span>
           <i class="fas fa-sync toolbar-btn-icon"></i>
         </div>
+        <!-- <div class="toolbar-button" @click="loadSurveyList();" v-if="current_tab == 'image'">
+          <span>อัปโหลดรูปภาพใหม่</span>
+          <i class="fas fa-arrow-up toolbar-btn-icon"></i>
+        </div>
+        <div class="toolbar-button" @click="loadSurveyList();" v-if="current_tab == 'pdf'">
+          <span>อัปโหลดเอกสาร PDF ใหม่</span>
+          <i class="fas fa-arrow-up toolbar-btn-icon"></i>
+        </div>-->
       </div>
     </div>
     <div class="tab-panel">
@@ -83,7 +91,11 @@
           </div>
           <div class="no-result" v-if="imageList.length <= 0">
             <div class="inner-box">
-              <div>
+              <div v-if="isLoading == true">
+                <h3>กำลังโหลด</h3>
+                <h4>โปรดรอสักครู่</h4>
+              </div>
+              <div v-if="isLoading == false">
                 <h3>ยังไม่มีรูปภาพในระบบตอนนี้</h3>
                 <h4>
                   <i class="fas fa-arrow-up toolbar-btn-icon" style="margin:0 5px 0 0;"></i>เริ่มต้นอัปโหลดรูปภาพใหม่ที่เครื่องมืออัปโหลดด้านบน
@@ -167,7 +179,11 @@
         </div>
         <div class="no-result" v-if="documentList.length <= 0">
           <div class="inner-box">
-            <div>
+            <div v-if="isLoading == true">
+              <h3>กำลังโหลด</h3>
+              <h4>โปรดรอสักครู่</h4>
+            </div>
+            <div v-if="isLoading == false">
               <h3>ยังไม่มีเอกสาร PDF ในระบบตอนนี้</h3>
               <h4>
                 <i class="fas fa-arrow-up toolbar-btn-icon" style="margin:0 5px 0 0;"></i>เริ่มต้นอัปโหลดเอกสารใหม่ที่เครื่องมืออัปโหลดด้านบน
@@ -177,11 +193,13 @@
         </div>
         <div class="doc-show-area" v-if="documentList.length > 0">
           <div class="doc-table-header">
+            <h5 class="doc-table-id">ID</h5>
             <h5 class="doc-table-filename">ชื่อไฟล์</h5>
             <h5 class="doc-table-date">อัปโหลดวันที่</h5>
           </div>
           <div class="doc-item" v-for="(data, i) in documentList" :key="i">
             <i class="far fa-file-pdf doc-item-icon"></i>
+            <h5 class="doc-item-id">{{data.id}}</h5>
             <h5 class="doc-item-filename">{{data.filename}}</h5>
             <h5 class="doc-item-date">{{data.date}}</h5>
             <button class="doc-delete-btn" @click="deletePdf(i)">
@@ -208,6 +226,28 @@
         </div>
       </div>
     </div>
+    <div class="popup-window-mask" v-if="isPopup == true"></div>
+    <div class="popup-window-container" v-if="isPopup == true">
+      <div class="popup-window-box" v-if="isUploading == true">
+        <div class="popup-display-area">
+          <h3>กำลังอัปโหลด</h3>
+        </div>
+      </div>
+      <div class="popup-window-box" v-if="isUploadComplete == true">
+        <div class="popup-display-area">
+          <h3 v-if="current_tab == 'image'">อัปโหลดรูปภาพสำเร็จ</h3>
+          <h3 v-if="current_tab == 'pdf'">อัปโหลดไฟล์ PDF สำเร็จ</h3>
+        </div>
+        <div class="popup-button-area">
+          <div class="popup-button" @click="dismissComplete();">
+            <span>
+              ตกลง
+              <i class="fas fa-check"></i>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -228,7 +268,10 @@ export default {
       filename: "",
       file: null,
       isUploading: false,
-      uploadIsOpen: false
+      uploadIsOpen: false,
+      isLoading: false,
+      isPopup: false,
+      isUploadComplete: false
     };
   },
   created() {
@@ -236,6 +279,10 @@ export default {
     this.$emit(`update:layout`, layout_default);
   },
   methods: {
+    dismissComplete() {
+      this.isUploadComplete = false;
+      this.isPopup = false;
+    },
     refreshList: function() {
       this.loadFileList(this.current_tab);
     },
@@ -262,6 +309,7 @@ export default {
       this.loadFileList(target);
     },
     loadFileList(target, page) {
+      this.isLoading = true;
       if (target === "pdf" || target === "image") {
         axios(
           `/admin/${
@@ -277,6 +325,9 @@ export default {
             if (error.response && error.response.data)
               console.error("get file list", error.response.data.error);
             else console.error("get file list", error.message);
+          })
+          .finally(() => {
+            this.isLoading = false;
           });
       }
     },
@@ -284,6 +335,7 @@ export default {
       if (this.isUploading) return "";
       if (target !== "pdf" && target !== "picture") return "";
       this.isUploading = true;
+      this.isPopup = true;
       const formData = new FormData();
       formData.append(target, this.file);
       formData.append("name", this.filename);
@@ -298,25 +350,37 @@ export default {
           if (target === "picture") {
             this.imageList.push(response.data);
             this.$refs.picture_input.value = "";
-            alert("อัปโหลดรูปภาพสำเร็จ");
             this.loadFileList("image", 1);
+            this.isUploadComplete = true;
+            if (this.isUploadComplete == false) this.isPopup = false;
+            else this.isPopup = true;
           } else {
             this.documentList.push(response.data);
             this.$refs.pdf_input.value = "";
-            alert("อัปโหลดไฟล์ PDF สำเร็จ");
             this.loadFileList("pdf", 1);
+            this.isUploadComplete = true;
+            if (this.isUploadComplete == false) this.isPopup = false;
+            else this.isPopup = true;
           }
         })
         .catch(error => {
           if (error.response && error.response.data) {
             console.error("upload file", error.response.data.error);
             if (error.response.data.error === "Picture already exists") {
+              this.isPopup = false;
+              this.isUploadComplete = false;
               alert("เกิดข้อผิดพลาด: อัปโหลดรูปภาพซ้ำ");
             } else if (error.response.data.error === "No Picture") {
+              this.isPopup = false;
+              this.isUploadComplete = false;
               alert("เกิดข้อผิดพลาด: ไม่มีรูปภาพ หรือ รูปแบบรูปภาพไม่รองรับ");
             } else if (error.response.data.error === "PDF already exists") {
+              this.isPopup = false;
+              this.isUploadComplete = false;
               alert("เกิดข้อผิดพลาด: อัปโหลดไฟล์ PDF ซ้ำ");
             } else if (error.response.data.error === "No PDF") {
+              this.isPopup = false;
+              this.isUploadComplete = false;
               alert("เกิดข้อผิดพลาด: ไม่มีไฟล์ PDF หรือ รูปแบบไฟล์ไม่รองรับ");
             }
           } else console.error("upload file", error.message);
@@ -367,6 +431,65 @@ export default {
 </script>
 
 <style scoped>
+.popup-button-area {
+  width: 100%;
+  height: fit-content;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.popup-display-area {
+  width: 100%;
+  height: calc(100% - 30px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.popup-button {
+  height: 30px;
+  background-color: #f0f0f0;
+  font-size: 15px;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  transition: all 0.1s;
+  user-select: none;
+  cursor: pointer;
+}
+.popup-button:hover {
+  background-color: #4ead4e;
+  color: #fff;
+}
+.popup-window-mask {
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 5;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+}
+.popup-window-box {
+  width: 300px;
+  height: 150px;
+  padding: 30px;
+  position: absolute;
+  background-color: #fff;
+  border-radius: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 6;
+  display: block;
+  text-align: center;
+  -webkit-box-shadow: 0px 0px 71px 0px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0px 0px 71px 0px rgba(0, 0, 0, 0.3);
+  box-shadow: 0px 0px 71px 0px rgba(0, 0, 0, 0.3);
+}
+.top-toolbar {
+  display: flex;
+}
 .no-result {
   color: #aaaaaa;
   background-color: #fff;
@@ -451,11 +574,12 @@ export default {
   padding: 10px 20px;
   padding-top: 0;
 }
+.doc-table-id {
+  width: 60px;
+}
 .doc-table-filename {
   width: 50%;
-}
-.doc-table-date {
-  margin-left: 30px;
+  padding-left: 30px;
 }
 .image-show-area {
   background-color: #fff;
@@ -544,6 +668,10 @@ export default {
   position: absolute;
   left: 0;
   margin-left: 20px;
+}
+.doc-item-id {
+  width: 30px;
+  padding-left: 30px;
 }
 .doc-item-filename {
   width: 50%;
@@ -639,6 +767,9 @@ export default {
   padding-left: 10px;
   outline: none;
 }
+.top-toolbar > div.toolbar-button:last-child {
+  margin-right: 0;
+}
 .toolbar-button {
   width: fit-content;
   height: 30px;
@@ -650,7 +781,9 @@ export default {
   display: flex;
   align-items: center;
   transition: all 0.1s;
+  margin-right: 10px;
 }
+
 .toolbar-button:hover {
   background-color: rgb(220, 220, 220);
   transition: all 0.1s;

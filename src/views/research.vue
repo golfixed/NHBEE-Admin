@@ -106,7 +106,8 @@
         </div>
       </div>
     </div>
-    <div class="newpost-window" v-if="isOpenNewPost === true">
+    <div class="popup-mask" v-if="isOpenNewPost === true" v-on:click="newPostClose();"></div>
+    <div class="newresearch-window" v-if="isOpenNewPost === true">
       <research-editor :newPostClose="newPostClose" :researchId="researchId" />
     </div>
   </div>
@@ -321,14 +322,30 @@ export default {
 .pagination-current {
   padding: 0 20px;
 }
-.newpost-window {
-  position: absolute;
+.popup-mask {
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 5;
   width: 100vw;
   height: 100vh;
-  background-color: #fff;
-  border-radius: 0;
+  position: absolute;
   top: 0;
   left: 0;
+}
+.newresearch-window {
+  height: fit-content;
+  position: absolute;
+  background-color: #fff;
+  border-radius: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-box-shadow: 0px 0px 71px 0px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0px 0px 71px 0px rgba(0, 0, 0, 0.3);
+  box-shadow: 0px 0px 71px 0px rgba(0, 0, 0, 0.3);
 }
 .post-view {
   background-color: #ffffff;
@@ -374,6 +391,7 @@ export default {
   display: flex;
   align-items: center;
   transition: all 0.1s;
+  user-select: none;
 }
 .toolbar-button:hover {
   background-color: rgb(220, 220, 220);

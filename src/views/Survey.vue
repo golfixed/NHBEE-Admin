@@ -37,7 +37,13 @@
       <div v-if="current_tab == 'full'">
         <div class="no-result" v-if="surveyFull.length <= 0 && serverDown == false">
           <div class="inner-box">
-            <h3>ยังไม่มีผลตอบรับแบบสอบถาม</h3>
+            <div v-if="isLoading == true">
+              <h3>กำลังโหลด</h3>
+              <h4>โปรดรอสักครู่</h4>
+            </div>
+            <div v-if="isLoading == false">
+              <h3>ยังไม่มีผลตอบรับแบบสอบถาม</h3>
+            </div>
           </div>
         </div>
         <div class="no-result" v-if="serverDown == true">
@@ -86,7 +92,13 @@
       <div v-if="current_tab == 'mini'">
         <div class="no-result" v-if="surveyMini.length <= 0 && serverDown == false">
           <div class="inner-box">
-            <h3>ยังไม่มีผลตอบรับแบบสอบถาม</h3>
+            <div v-if="isLoading == true">
+              <h3>กำลังโหลด</h3>
+              <h4>โปรดรอสักครู่</h4>
+            </div>
+            <div v-if="isLoading == false">
+              <h3>ยังไม่มีผลตอบรับแบบสอบถาม</h3>
+            </div>
           </div>
         </div>
         <div class="no-result" v-if="serverDown == true">
@@ -153,6 +165,7 @@ export default {
       filename: "",
       file: null,
       isUploading: false,
+      isLoading: false,
       uploadIsOpen: false,
       limit: 5,
       surveyFull: [],
@@ -191,6 +204,7 @@ export default {
       this.loadSurveyList(target);
     },
     loadSurveyList(target, page) {
+      this.isLoading = true;
       if (target == "full") {
         axios("admin/survey/full?limit=" + this.limit + "&page=" + page)
           .then(response => {
@@ -210,6 +224,9 @@ export default {
               console.error("get survey list", error.message);
               this.serverDown = true;
             }
+          })
+          .finally(() => {
+            this.isLoading = false;
           });
       } else if (target == "mini") {
         axios("admin/survey/mini?limit=" + this.limit + "&page=" + page)
@@ -230,6 +247,9 @@ export default {
               console.error("get survey list", error.message);
               this.serverDown = true;
             }
+          })
+          .finally(() => {
+            this.isLoading = false;
           });
       }
     },
