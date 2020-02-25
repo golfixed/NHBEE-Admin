@@ -23,9 +23,22 @@
         <h4>ผู้เขียน</h4>
         <input v-model="author" placeholder="ชื่อผู้เขียน" />
       </div>
-      <img v-if="pictureId" :src="pictureURL" :alt="pictureId" height="50px" />
-      <p v-else>เลือกรูปภาพปก</p>
-      <select-picture v-model="pictureId" :url.sync="pictureURL" style="margin-bottom: 20px;" />
+
+      <div>
+        <p v-if="pictureId">รูปภาพปกที่เลือก</p>
+        <p v-else>เลือกรูปภาพปก</p>
+        <div class="selected-img" v-if="pictureId">
+          <img v-if="pictureId" :src="pictureURL" :alt="pictureId" />
+          <i class="fas fa-edit" v-on:click="clearImgSelect();"></i>
+        </div>
+        <select-picture
+          v-if="pictureId == null"
+          v-model="pictureId"
+          :url.sync="pictureURL"
+          style="margin-bottom: 20px;"
+        />
+      </div>
+
       <div class="thai-post-box">
         <h4>วันที่</h4>
         <input type="date" v-model="publishDate" placeholder="Publish Date" />
@@ -101,6 +114,9 @@ export default {
     }
   },
   methods: {
+    clearImgSelect() {
+      this.pictureId = null;
+    },
     switchTab: function(target) {
       this.current_tab = target;
     },
@@ -214,6 +230,24 @@ export default {
 }
 .control-tab {
   display: block;
+}
+
+.selected-img {
+  background-color: #f1f1f1;
+  position: relative;
+  padding: 10px;
+  margin: 5px 0 20px;
+  display: flex;
+  align-items: center;
+}
+.selected-img > img {
+  width: 200px;
+}
+.selected-img > i {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translate(0, -50%);
 }
 
 .window-headtext {

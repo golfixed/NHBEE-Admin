@@ -184,21 +184,4 @@ table > tr:hover {
 .form-set {
   margin-bottom: 10px;
 }
-button {
-  width: fit-content;
-  height: 30px;
-  background-color: #ececec;
-  font-size: 15px;
-  padding: 0 20px;
-  display: flex;
-  align-items: center;
-  transition: all 0.1s;
-  margin-right: 10px;
-}
-button:hover {
-  background-color: rgb(220, 220, 220);
-  transition: all 0.1s;
-  cursor: pointer;
-  color: #fff;
-}
 </style>

@@ -32,14 +32,14 @@
             <option value="picture">รูปภาพ</option>
           </select>
         </div>
-        <div>
+        <div class>
           <div v-if="obj.type === 'text'">
             <textarea class="content-textarea" v-model="obj.data"></textarea>
           </div>
           <div v-else-if="obj.type === 'picture'">
-            <img v-if="obj.data" :src="obj.url" :alt="obj.data" height="50px" />
+            <img v-if="obj.data" :src="obj.url" :alt="obj.data" width="200px" />
             <p v-else>เลือกรูปภาพ</p>
-            <select-picture v-model="obj.data" :url.sync="obj.url" />
+            <select-picture v-if="obj.url == null" v-model="obj.data" :url.sync="obj.url" />
           </div>
           <div v-else>Select Type</div>
         </div>
@@ -135,7 +135,7 @@ export default {
   margin: 5px 0;
   padding: 5px 0;
   display: grid;
-  grid-template-columns: 100px auto 50px;
+  grid-template-columns: 100px calc(100% - 150px) 50px;
 }
 .content-block {
   padding: 10px;
