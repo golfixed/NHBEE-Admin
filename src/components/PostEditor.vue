@@ -19,13 +19,17 @@
       <post-content lang="en" v-model="en" />
     </div>
     <div>
-      <input v-model="author" placeholder="author" />
-      <br />
+      <div class="thai-post-box">
+        <h4>ผู้เขียน</h4>
+        <input v-model="author" placeholder="ชื่อผู้เขียน" />
+      </div>
       <img v-if="pictureId" :src="pictureURL" :alt="pictureId" height="50px" />
       <p v-else>เลือกรูปภาพปก</p>
-      <select-picture v-model="pictureId" :url.sync="pictureURL" />
-      <input type="date" v-model="publishDate" placeholder="Publish Date" />
-      <button @click="savePost" :disabled="isLoading">Save</button>
+      <select-picture v-model="pictureId" :url.sync="pictureURL" style="margin-bottom: 20px;" />
+      <div class="thai-post-box">
+        <h4>วันที่</h4>
+        <input type="date" v-model="publishDate" placeholder="Publish Date" />
+      </div>
     </div>
     <hr class="section-hr" style="margin-top: 20px;" />
     <div class="popup-btn-panel">
@@ -206,10 +210,6 @@ export default {
   height: 30px;
   font-size: 14px;
   margin: 5px 0 20px 0;
-  padding-left: 10px;
-}
-.thai-post-box > input::placeholder,
-.thai-post-box > input::-webkit-input-placeholder {
   padding-left: 10px;
 }
 .control-tab {
