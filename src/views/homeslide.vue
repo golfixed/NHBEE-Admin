@@ -5,14 +5,36 @@
     >
       <h1 class="tab-headtext">Homeslide</h1>
       <div class="post-toolbar">
-        <div class="toolbar-button" @click="loadFileList();">
+        <div class="toolbar-button" @click="loadFileList(1);">
           <span>รีเฟรชข้อมูล</span>
           <i class="fas fa-sync toolbar-btn-icon"></i>
         </div>
       </div>
     </div>
+    <div class="tab-panel">
+      <button
+        class="tab-item-active"
+        v-if="current_tab === 'lib'"
+        @click="switchTab('lib')"
+      >รูปภาพในคลัง</button>
+      <button
+        class="tab-item-inactive"
+        v-if="current_tab != 'lib'"
+        @click="switchTab('lib')"
+      >รูปภาพในคลัง</button>
+      <button
+        class="tab-item-active"
+        v-if="current_tab === 'onshow'"
+        @click="switchTab('onshow')"
+      >รูปภาพที่แสดงอยู่</button>
+      <button
+        class="tab-item-inactive"
+        v-if="current_tab != 'onshow'"
+        @click="switchTab('onshow')"
+      >รูปภาพที่แสดงอยู่</button>
+    </div>
     <div class="tab-view">
-      <div>
+      <div v-if="current_tab == 'lib'">
         <div
           class="upload-text"
           style="padding-top:20px;background-color: #fff;padding-left: 20px;"
@@ -47,12 +69,12 @@
         </div>
         <div class="upload-text" style="background-color: #fff;padding-left: 20px;">
           <i class="far fa-images" style="margin-right: 10px;"></i>
-          <h5>รูปภาพในระบบตอนนี้</h5>
+          <h5>รูปภาพในคลัง</h5>
         </div>
         <div class="no-result" v-if="imageList.length <= 0">
           <div class="inner-box">
             <div>
-              <h3>ยังไม่มีรูปภาพในระบบตอนนี้</h3>
+              <h3>ยังไม่มีรูปภาพในคลัง</h3>
               <h4>เริ่มต้นอัปโหลดรูปภาพใหม่ที่เครื่องมืออัปโหลดด้านบน</h4>
             </div>
           </div>
@@ -61,8 +83,9 @@
           <div class="image-item" v-for="(data, i) in imageList" :key="i">
             <img class="image-item-img" :src="data.url" />
             <h5 class="image-item-filename">{{data.id}}</h5>
-            <button class="image-delete-btn" @click="deleteImage(i)">
-              <i class="fas fa-trash-alt"></i>
+            <button class="image-delete-btn">
+              <i class="fas fa-plus add-btn"></i>
+              <i class="fas fa-trash-alt trash-btn" @click="deleteImage(i)"></i>
             </button>
           </div>
           <div class="image-pagination">
@@ -80,6 +103,33 @@
               @click="nextPage(page.now);"
             >
               <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+        <!-- ONLINE GALLERY -->
+      </div>
+      <div v-if="current_tab == 'onshow'">
+        <div
+          class="upload-text"
+          style="background-color: #fff;padding-top:20px;padding-left: 20px;"
+        >
+          <i class="far fa-images" style="margin-right: 10px;"></i>
+          <h5>รูปภาพที่แสดงอยู่</h5>
+        </div>
+        <div class="no-result" v-if="onShowImg.length <= 0">
+          <div class="inner-box">
+            <div>
+              <h3>ยังไม่มีรูปภาพที่แสดงอยู่</h3>
+              <h4>เริ่มต้นเลือกรูปภาพสำหรับจัดแสดงที่แถบ "รูปภาพในคลัง"</h4>
+            </div>
+          </div>
+        </div>
+        <div class="image-show-area" v-if="onShowImg.length > 0">
+          <div class="image-item" v-for="(data, i) in onShowImg" :key="i">
+            <img class="image-item-img" :src="data.url" />
+            <h5 class="image-item-filename">{{data.id}}</h5>
+            <button class="image-delete-btn">
+              <i class="fas fa-trash-alt trash-btn" @click="deleteImage(i)"></i>
             </button>
           </div>
         </div>
@@ -103,7 +153,9 @@ export default {
       filename: "",
       file: null,
       isUploading: false,
-      uploadIsOpen: false
+      uploadIsOpen: false,
+      onShowImg: [],
+      current_tab: "lib"
     };
   },
   created() {
@@ -112,7 +164,7 @@ export default {
   },
   methods: {
     refreshList: function() {
-      this.loadFileList();
+      this.loadFileList(1);
     },
     nextPage: function(page) {
       if (this.page.now <= this.page.all) {
@@ -200,6 +252,10 @@ export default {
       const file = e.target.files[0];
       this.filename = file.name;
       this.file = file;
+    },
+    switchTab: function(target) {
+      this.current_tab = target;
+      this.loadFileList(1);
     }
   }
 };
@@ -337,7 +393,7 @@ export default {
 }
 .image-delete-btn {
   border-radius: 10000px;
-  width: 35px;
+  width: fit-content;
   height: 35px;
   background-color: #fff;
   position: absolute;
@@ -350,9 +406,16 @@ export default {
   box-shadow: 0px 2px 5px 1px rgba(0, 0, 0, 0.22);
   border: 0;
 }
-.image-delete-btn:hover {
+.trash-btn:hover {
   color: red;
   outline: none;
+}
+.add-btn:hover {
+  color: rgb(68, 160, 15);
+  outline: none;
+}
+.image-delete-btn > i {
+  margin: 0 7px;
 }
 .image-item:hover > .image-delete-btn {
   display: block;
