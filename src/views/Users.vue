@@ -28,7 +28,7 @@
             <!-- <button @click="clearUser">Clear Form</button> -->
           </th>
         </tr>
-        <tr v-for="(user, i) in userList" :key="'user_' + user.id">
+        <tr class="list-item" v-for="(user, i) in userList" :key="'user_' + user.id">
           <td>{{ user.id }}</td>
           <td>{{ user.username }}</td>
           <td>{{ user.name }}</td>
@@ -433,6 +433,7 @@ table > tr > th {
   border: 0;
   margin-right: 5px;
   font-size: 15px;
+  cursor: pointer;
 }
 .list-icon-btn:hover {
   -webkit-transition: all 0.1s;
@@ -445,5 +446,16 @@ table > tr > th {
 }
 .list-icon-btn-edit:hover {
   color: grey;
+}
+.list-item {
+  transition: all 0.1s;
+  height: 30px;
+}
+.list-item:hover {
+  transition: all 0.1s;
+  -webkit-box-shadow: 0px 2px 5px 1px rgba(0, 0, 0, 0.22);
+  -moz-box-shadow: 0px 2px 5px 1px rgba(0, 0, 0, 0.22);
+  box-shadow: 0px 2px 5px 1px rgba(0, 0, 0, 0.22);
+  border-radius: 5px;
 }
 </style>
