@@ -6,9 +6,9 @@
     >
       <h1 class="tab-headtext">บัญชีผู้ใช้</h1>
       <div class="post-toolbar">
-        <div class="toolbar-button" @click="newPostOpen();">
+        <div class="toolbar-button" @click="newUserToggle('open');">
           <span>เพิ่มบัญชีใหม่</span>
-          <i class="fas fa-edit toolbar-btn-icon"></i>
+          <i class="fas fa-plus toolbar-btn-icon"></i>
         </div>
       </div>
     </div>
@@ -35,70 +35,101 @@
           <td>
             <i :class="'fas fa-' + (user.admin ? 'check' : 'times')"></i>
           </td>
-          <td>
-            <button @click="editUser(i)">Edit</button>
-            <button @click="deleteUser(i)">Delete</button>
+          <td style="position:relative;">
+            <button class="list-icon-btn list-icon-btn-edit" @click="editUser(i)">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="list-icon-btn list-icon-btn-trash" @click="deleteUser(i)">
+              <i class="fas fa-trash"></i>
+            </button>
           </td>
         </tr>
       </table>
     </div>
-    <p style="color: red;" v-if="errorMessage">{{ errorMessage }}</p>
-    <div v-if="userIndex >= 0" class="edit-account-box">
-      <div class="section-text" style="  padding-bottom: 10px;">
-        <i class="fas fa-user-edit" style="margin-right: 10px;"></i>
-        <h5>แก้ไขบัญชีผู้ใช้</h5>
+    <div class="popup-mask" v-if="isNewOpen === true" v-on:click="newUserToggle('close');"></div>
+    <div class="popup-window" v-if="isNewOpen == true">
+      <div v-if="userIndex >= 0" class="edit-account-box">
+        <div class="control-tab">
+          <h3 class="window-headtext">
+            แก้ไขบัญชีผู้ใช้
+            <i class="fas fa-edit popup-btn-icon"></i>
+          </h3>
+          <hr class="section-hr" />
+        </div>
+        <div class="input-item">
+          <h4>ชื่อผู้ใช้งาน</h4>
+          <input type="text" v-model="username" placeholder="ตัวอย่าง: admin" />
+        </div>
+        <div class="input-item">
+          <h4>ชื่อ นามสกุล</h4>
+          <input type="text" v-model="name" placeholder="ตัวอย่าง: Winai Jongpakdee" />
+        </div>
+        <div class="input-item">
+          <h4>รหัสผ่าน</h4>
+          <div class="checkbox">
+            <input type="checkbox" v-model="isPassword" />
+            <label for="checkbox">เปลี่ยนรหัสผ่าน</label>
+          </div>
+        </div>
+        <div v-if="isPassword" class="input-item">
+          <label for="checkbox">รหัสผ่านใหม่</label>
+          <input type="password" v-model="password" placeholder="รหัสผ่านใหม่" />
+        </div>
+        <div class="input-item">
+          <h4>สิทธิ์การใช้งาน</h4>
+          <div class="checkbox">
+            <input type="checkbox" value="true" v-model="admin" />
+            <label for="checkbox">ผู้ดูแลระบบ</label>
+          </div>
+        </div>
       </div>
-      <div class="input-item">
-        <h4>ชื่อผู้ใช้งาน</h4>
-        <input type="text" v-model="username" placeholder="Username" />
+      <div v-else-if="userIndex < 0" class="new-account-box">
+        <div class="control-tab">
+          <h3 class="window-headtext">
+            สร้างบัญชีผู้ใช้ใหม่
+            <i class="fas fa-plus popup-btn-icon"></i>
+          </h3>
+          <hr class="section-hr" />
+        </div>
+        <div class="input-item">
+          <h4>ชื่อผู้ใช้งาน</h4>
+          <input type="text" v-model="username" placeholder="ตัวอย่าง: admin" />
+        </div>
+        <div class="input-item">
+          <h4>ชื่อ นามสกุล</h4>
+          <input type="text" v-model="name" placeholder="ตัวอย่าง: Winai Jongpakdee" />
+        </div>
+        <div class="input-item">
+          <h4>รหัสผ่าน</h4>
+          <input type="password" v-model="password" placeholder="รหัสผ่าน" />
+        </div>
+        <div class="input-item">
+          <h4>สิทธิ์การใช้งาน</h4>
+          <div class="checkbox">
+            <input type="checkbox" value="true" v-model="admin" />
+            <label for="checkbox">ผู้ดูแลระบบ</label>
+          </div>
+        </div>
       </div>
-      <div class="input-item">
-        <h4>ชื่อ นามสกุล</h4>
-        <input type="text" v-model="name" placeholder="Name" />
-      </div>
-      <div class="input-item">
-        <h4>รหัสผ่าน</h4>
-        <input type="checkbox" v-model="isPassword" />
-        <label for="checkbox">Change Password</label>
-      </div>
-      <div v-if="isPassword" class="input-item">
-        <input type="password" v-model="password" placeholder="Password" />
-      </div>
-      <div class="input-item">
-        <h4>สิทธิ์การใช้งาน</h4>
-        <input type="checkbox" v-model="admin" />
-        <label for="checkbox">ผู้ดูแลระบบ</label>
-      </div>
-      <div class="toolbar-button" @click="saveUser()" style="margin-top:20px;">
-        <span>บันทึก</span>
-        <i class="fas fa-save toolbar-btn-icon"></i>
-      </div>
-    </div>
-    <div v-else-if="userIndex < 0" class="new-account-box">
-      <div class="section-text" style="  padding-bottom: 10px;">
-        <i class="fas fa-user-plus" style="margin-right: 10px;"></i>
-        <h5>สร้างบัญชีผู้ใช้ใหม่</h5>
-      </div>
-      <div class="input-item">
-        <h4>ชื่อผู้ใช้งาน</h4>
-        <input type="text" v-model="username" placeholder="Username" />
-      </div>
-      <div class="input-item">
-        <h4>ชื่อ นามสกุล</h4>
-        <input type="text" v-model="name" placeholder="Name" />
-      </div>
-      <div class="input-item">
-        <h4>รหัสผ่าน</h4>
-        <input type="password" v-model="password" placeholder="Password" />
-      </div>
-      <div class="input-item">
-        <h4>สิทธิ์การใช้งาน</h4>
-        <input type="checkbox" v-model="admin" />
-        <label for="checkbox">ผู้ดูแลระบบ</label>
-      </div>
-      <div class="toolbar-button" @click="saveUser()" style="margin-top:20px;">
-        <span>บันทึก</span>
-        <i class="fas fa-save toolbar-btn-icon"></i>
+      <p class="error-msg" v-if="errorMessage">{{ errorMessage }}</p>
+      <hr class="section-hr" style="margin-top: 20px;" />
+      <div class="popup-btn-panel">
+        <div class="left-group">
+          <div
+            class="popup-button popup-button-cancel"
+            @click="newUserToggle('close');"
+            :disabled="isLoading"
+          >
+            <span>ยกเลิก</span>
+            <i class="fas fa-times popup-btn-icon"></i>
+          </div>
+        </div>
+        <div class="right-group">
+          <div class="popup-button popup-button-submit" @click="saveUser();" :disabled="isLoading">
+            <span>บันทึกข้อมูล</span>
+            <i class="fas fa-save popup-btn-icon"></i>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -115,6 +146,7 @@ export default {
     return {
       userList: [],
       isLoading: false,
+      isNewOpen: false,
       userIndex: -1,
       username: "",
       name: "",
@@ -129,6 +161,12 @@ export default {
     this.$emit(`update:layout`, layout_default);
   },
   methods: {
+    newUserToggle(cmd) {
+      this.clearUser();
+      if (cmd == "open") this.isNewOpen = true;
+      else if (cmd == "close") this.isNewOpen = false;
+      else this.isNewOpen = this.isNewOpen;
+    },
     getUser() {
       if (this.isLoading) return "";
       this.isLoading = true;
@@ -143,6 +181,7 @@ export default {
         })
         .finally(() => {
           this.isLoading = false;
+          this.isNewOpen = false;
         });
     },
     clearUser() {
@@ -152,8 +191,10 @@ export default {
       this.isPassword = false;
       this.password = "";
       this.admin = false;
+      this.errorMessage = false;
     },
     editUser(index) {
+      this.isNewOpen = true;
       const data = this.userList[index];
       if (data) {
         this.userIndex = index;
@@ -232,8 +273,6 @@ table > tr > th {
 }
 .users-display {
   background-color: #fff;
-  border-radius: 5px;
-  border: 1px solid grey;
 }
 .section-text {
   display: flex;
@@ -244,28 +283,26 @@ table > tr > th {
 }
 .new-account-box,
 .edit-account-box {
-  width: 50%;
   background-color: #fff;
-  border: 1px solid grey;
-  border-radius: 5px;
-  margin-top: 20px;
-  padding: 20px;
+  width: 350px;
 }
-.input-item {
-  display: flex;
-  align-items: center;
+.section-hr {
+  border: 1px solid #ececec;
+}
+
+.input-item > input {
+  background-color: #f1f1f1;
+  border: 0;
+  width: calc(100% - 10px);
   height: 30px;
-  color: #404040;
-}
-.input-item > h4 {
-  width: 200px;
+  font-size: 14px;
+  margin: 5px 0 20px 0;
+  padding-left: 10px;
 }
 .toolbar-button {
   width: fit-content;
   height: 30px;
   background-color: #fff;
-  /* border-radius: 5px;
-  border: 1px solid grey; */
   font-size: 15px;
   padding: 0 20px;
   display: flex;
@@ -279,5 +316,134 @@ table > tr > th {
 }
 .toolbar-btn-icon {
   margin-left: 10px;
+}
+.popup-mask {
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 5;
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.popup-window {
+  padding: 30px;
+  height: fit-content;
+  position: absolute;
+  background-color: #fff;
+  border-radius: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 6;
+  -webkit-box-shadow: 0px 0px 71px 0px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0px 0px 71px 0px rgba(0, 0, 0, 0.3);
+  box-shadow: 0px 0px 71px 0px rgba(0, 0, 0, 0.3);
+}
+.popup-button {
+  width: fit-content;
+  height: 30px;
+  background-color: #ececec;
+  font-size: 15px;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  transition: all 0.1s;
+  margin-right: 10px;
+  user-select: none;
+}
+.popup-button:hover {
+  background-color: rgb(220, 220, 220);
+  transition: all 0.1s;
+  cursor: pointer;
+  color: #fff;
+}
+.popup-btn-panel {
+  display: grid;
+  grid-template-columns: repeat(2, 50%);
+  margin-top: 20px;
+}
+.left-group {
+  display: flex;
+  justify-content: flex-start;
+}
+.right-group {
+  display: flex;
+  justify-content: flex-end;
+}
+.right-group > div.popup-button:last-child {
+  margin-right: 0;
+}
+
+.left-group,
+.right-group {
+  display: flex;
+  position: relative;
+}
+
+.popup-button-cancel:hover {
+  background-color: rgb(163, 163, 163);
+}
+.popup-button-clear:hover {
+  background-color: rgb(255, 111, 111);
+}
+.popup-button-submit:hover {
+  background-color: rgb(55, 199, 120);
+}
+.popup-btn-icon {
+  margin-left: 10px;
+}
+.window-headtext {
+  font-size: 25px;
+  padding-bottom: 15px;
+  margin: 0;
+}
+.control-tab {
+  display: block;
+}
+.error-msg {
+  color: #fff;
+  background-color: #ff0000a1;
+  text-align: center;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+.checkbox {
+  display: flex;
+  background-color: #f1f1f1;
+  border: 0;
+  width: calc(100% - 10px);
+  height: 30px;
+  font-size: 14px;
+  margin: 5px 0 20px 0;
+  padding-left: 10px;
+  align-items: center;
+}
+.checkbox > label {
+  margin-left: 10px;
+}
+.list-icon-btn {
+  right: 0;
+  -webkit-transition: all 0.1s;
+  transition: all 0.1s;
+  outline: none;
+  border: 0;
+  margin-right: 5px;
+  font-size: 15px;
+}
+.list-icon-btn:hover {
+  -webkit-transition: all 0.1s;
+  transition: all 0.1s;
+  -webkit-transform: scale(1.1);
+  transform: scale(1.1);
+}
+.list-icon-btn-trash:hover {
+  color: red;
+}
+.list-icon-btn-edit:hover {
+  color: grey;
 }
 </style>
