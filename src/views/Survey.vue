@@ -1,12 +1,10 @@
 <template>
   <div class="isdesktop">
-    <div
-      style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:20px;"
-    >
+    <div class="toolbar-panel-bg">
       <h1 class="tab-headtext">ผลแบบสอบถาม</h1>
       <div class="post-toolbar">
-        <div class="toolbar-button" @click="loadSurveyList();">
-          <span>รีเฟรชข้อมูล</span>
+        <div class="toolbar-button toolbar-button-white" @click="loadSurveyList();">
+          <span>รีเฟรช</span>
           <i class="fas fa-sync toolbar-btn-icon"></i>
         </div>
       </div>
@@ -36,7 +34,7 @@
     <div class="tab-view">
       <div v-if="current_tab == 'full'">
         <div class="no-result" v-if="surveyFull.length <= 0 && serverDown == false">
-          <div class="inner-box">
+          <div class="no-inner-box">
             <div v-if="isLoading == true">
               <h3>กำลังโหลด</h3>
               <h4>โปรดรอสักครู่</h4>
@@ -47,7 +45,7 @@
           </div>
         </div>
         <div class="no-result" v-if="serverDown == true">
-          <div class="inner-box">
+          <div class="no-inner-box">
             <h3>พบปัญหาในการเชื่อมต่อกับ server</h3>
             <h4>โปรดตรวจสอบการเชื่อมต่ออินเทอร์เน็ต</h4>
             <h4>หากยังพบปัญหาโปรดติดต่อเจ้าหน้าที่ดูแลระบบ</h4>
@@ -91,7 +89,7 @@
       </div>
       <div v-if="current_tab == 'mini'">
         <div class="no-result" v-if="surveyMini.length <= 0 && serverDown == false">
-          <div class="inner-box">
+          <div class="no-inner-box">
             <div v-if="isLoading == true">
               <h3>กำลังโหลด</h3>
               <h4>โปรดรอสักครู่</h4>
@@ -102,7 +100,7 @@
           </div>
         </div>
         <div class="no-result" v-if="serverDown == true">
-          <div class="inner-box">
+          <div class="no-inner-box">
             <h3>พบปัญหาในการเชื่อมต่อกับ server</h3>
             <h4>โปรดตรวจสอบการเชื่อมต่ออินเทอร์เน็ต</h4>
             <h4>หากยังพบปัญหาโปรดติดต่อเจ้าหน้าที่ดูแลระบบ</h4>
@@ -263,18 +261,6 @@ export default {
 </script>
 
 <style scoped>
-.no-result {
-  height: 300px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: #aaaaaa;
-  background-color: #fff;
-}
-.no-result > div.inner-box {
-  text-align: center;
-  cursor: default;
-}
 .prev-btn,
 .next-btn {
   border: 0;
@@ -315,28 +301,6 @@ export default {
 }
 .pagination-current {
   padding: 0 20px;
-}
-.tab-panel {
-  width: 100%;
-}
-.tab-item-active {
-  background-color: #fff !important;
-  font-weight: bold;
-  border: 0;
-  border-width: 3px 0 0 0;
-}
-.tab-item-inactive {
-  border-width: 0;
-}
-.tab-item-inactive,
-.tab-item-active {
-  width: fit-content;
-  background-color: transparent;
-  height: 40px;
-  border-radius: 0;
-  font-size: 15px;
-  outline: none;
-  padding: 0 40px;
 }
 .doc-table-header {
   display: -webkit-box;
@@ -471,94 +435,5 @@ export default {
   margin-right: 20px;
   border: 0;
   font-size: 17px;
-}
-.lib-toolbar {
-  display: block;
-  padding: 0 20px 20px 20px;
-  background-color: #fff;
-  position: relative;
-}
-.lib-toolbar-button {
-  width: -webkit-fit-content;
-  width: -moz-fit-content;
-  width: fit-content;
-  height: 30px;
-  background-color: #eaeaea;
-  border-radius: 0;
-  border: 0;
-  font-size: 15px;
-  padding: 0 20px;
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  -webkit-transition: all 0.1s;
-  transition: all 0.1s;
-}
-.lib-toolbar-button:hover {
-  background-color: rgb(35, 124, 0);
-  color: #fff;
-  transition: all 0.1s;
-  cursor: pointer;
-}
-.lib-toolbar-btn-icon {
-  margin-left: 10px;
-}
-.upload-text {
-  display: flex;
-  align-items: center;
-}
-.upload-text > h5 {
-  font-size: 20px;
-}
-.upload-panel {
-  display: block;
-  position: relative;
-  border: 1px solid #f0f0f0;
-  border-width: 0 0 1px 0;
-  padding: 20px;
-}
-.upload-panel > div {
-  display: flex;
-  align-items: center;
-  height: 40px;
-}
-.upload-panel > div > h5 {
-  min-width: 100px;
-}
-.upload-name-file {
-  height: 30px;
-  width: 200px;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  border: 0;
-  font-size: 15px;
-  background-color: #eaeaea;
-  padding-left: 10px;
-  outline: none;
-}
-.toolbar-button {
-  width: fit-content;
-  height: 30px;
-  background-color: #fff;
-  /* border-radius: 5px;
-  border: 1px solid grey; */
-  font-size: 15px;
-  padding: 0 20px;
-  display: flex;
-  align-items: center;
-  transition: all 0.1s;
-}
-.toolbar-button:hover {
-  background-color: rgb(220, 220, 220);
-  transition: all 0.1s;
-  cursor: pointer;
-}
-.toolbar-btn-icon {
-  margin-left: 10px;
 }
 </style>

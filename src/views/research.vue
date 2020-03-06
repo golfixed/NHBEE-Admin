@@ -1,21 +1,19 @@
 <template>
   <div class="isdesktop">
-    <div
-      style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:20px;"
-    >
+    <div class="toolbar-panel-bg" style="margin-bottom: 20px;">
       <h1 class="tab-headtext">งานวิจัย</h1>
       <div class="post-toolbar">
-        <div class="toolbar-button" @click="ftSearch();" style="margin-right: 10px;">
-          <span>รีเฟรชข้อมูล</span>
+        <div class="toolbar-button toolbar-button-white" @click="ftSearch();">
+          <span>รีเฟรช</span>
           <i class="fas fa-sync toolbar-btn-icon"></i>
         </div>
-        <div class="toolbar-button" @click="newResearch();">
-          <span>รายการงานวิจัยใหม่</span>
-          <i class="fas fa-edit toolbar-btn-icon"></i>
+        <div class="toolbar-button toolbar-button-white" @click="newResearch();">
+          <span>งานวิจัยใหม่</span>
+          <i class="fas fa-plus toolbar-btn-icon"></i>
         </div>
       </div>
     </div>
-    <div class="post-view">
+    <div class="research-view">
       <div class="searchbox-div" v-if="dataList.length > 0 || isSearch == true">
         <div class="form-set">
           <p class="form-set-label">ค้นหาด้วยชื่อ</p>
@@ -26,7 +24,7 @@
       </div>
       <div class="no-result">
         <div
-          class="inner-box"
+          class="no-inner-box"
           v-if="dataList.length <= 0 && isLoading == false && isSearch == true"
         >
           <div>
@@ -35,7 +33,7 @@
           </div>
         </div>
         <div
-          class="inner-box"
+          class="no-inner-box"
           v-if="isLoading == false && dataList.length <= 0 && isSearch == false"
         >
           <div>
@@ -49,7 +47,7 @@
             </h4>
           </div>
         </div>
-        <div class="inner-box" v-if="isLoading == true">
+        <div class="no-inner-box" v-if="isLoading == true">
           <div>
             <h3>กำลังโหลด</h3>
             <h4>โปรดรอสักครู่</h4>
@@ -107,7 +105,7 @@
       </div>
     </div>
     <div class="popup-mask" v-if="isOpenNewPost === true" v-on:click="newPostClose();"></div>
-    <div class="newresearch-window" v-if="isOpenNewPost === true">
+    <div class="popup-window" v-if="isOpenNewPost === true">
       <research-editor :newPostClose="newPostClose" :researchId="researchId" />
     </div>
   </div>
@@ -236,18 +234,7 @@ export default {
 </script>
 
 <style>
-.no-result {
-  color: #aaaaaa;
-}
-.no-result > div.inner-box {
-  text-align: center;
-  cursor: default;
-  height: 300px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.no-result > div.inner-box > div {
+.no-result > div.no-inner-box > div {
   text-align: center;
 }
 .searchbox-div > i {
@@ -322,36 +309,11 @@ export default {
 .pagination-current {
   padding: 0 20px;
 }
-.popup-mask {
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 5;
-  width: 100vw;
-  height: 100vh;
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-.newresearch-window {
-  height: fit-content;
-  position: absolute;
-  background-color: #fff;
-  border-radius: 0;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 6;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  -webkit-box-shadow: 0px 0px 71px 0px rgba(0, 0, 0, 0.3);
-  -moz-box-shadow: 0px 0px 71px 0px rgba(0, 0, 0, 0.3);
-  box-shadow: 0px 0px 71px 0px rgba(0, 0, 0, 0.3);
-}
-.post-view {
+
+.research-view {
   background-color: #ffffff;
-  /* border: solid grey; */
-  /* border-width: 1px; */
-  /* border-radius: 5px; */
+  border-width: 1px;
+  border-radius: 10px;
   padding: 20px;
 }
 .section-title {
@@ -374,31 +336,10 @@ export default {
 .form-set-input {
   width: 100%;
   min-height: 30px;
-  /* border-radius: 5px;
-  border: 1px solid #aaaaaa; */
-}
-.post-toolbar {
-  display: flex;
-}
-.toolbar-button {
-  width: fit-content;
-  height: 30px;
-  background-color: #fff;
-  /* border-radius: 5px;
-  border: 1px solid grey; */
-  font-size: 15px;
-  padding: 0 20px;
-  display: flex;
-  align-items: center;
-  transition: all 0.1s;
-  user-select: none;
-}
-.toolbar-button:hover {
-  background-color: rgb(220, 220, 220);
-  transition: all 0.1s;
-  cursor: pointer;
-}
-.toolbar-btn-icon {
-  margin-left: 10px;
+  border-radius: 100px;
+  border: 1px solid #e8e8e8;
+  outline: none;
+  padding-left: 10px;
+  font-size: 14px;
 }
 </style>

@@ -1,11 +1,13 @@
 <template>
-  <div class="popup-window">
+  <div class="inner-popup-window">
     <div class="control-tab">
-      <h3 class="window-headtext">
+      <h3 class="tab-title-popup">
         {{ saveId ? 'แก้ไขรายการงานวิจัย' : 'รายการงานวิจัยใหม่' }}
         <i
           class="fas fa-edit popup-btn-icon"
+          v-if="saveId"
         ></i>
+        <i class="fas fa-plus popup-btn-icon" v-if="!saveId"></i>
       </h3>
       <hr class="section-hr" style="margin: 10px 0 30px 0" />
     </div>
@@ -29,7 +31,7 @@
       </div>
     </div>
     <hr class="section-hr" style="margin-top: 20px;" />
-    <div class="popup-btn-panel">
+    <div class="popup-btn-panel-2col">
       <div class="left-group">
         <div
           class="popup-button popup-button-cancel"
@@ -164,7 +166,7 @@ export default {
 };
 </script>
 <style scoped>
-.popup-window {
+.inner-popup-window {
   padding: 30px;
   width: 600px;
 }
@@ -183,10 +185,6 @@ export default {
 }
 .control-tab {
   display: block;
-}
-.window-headtext {
-  font-size: 25px;
-  margin: 0;
 }
 .tab-headtext {
   margin: 20px 0;
@@ -214,63 +212,6 @@ export default {
   outline: none;
   padding: 0 40px;
 }
-.section-hr {
-  border: 1px solid #ececec;
-}
-.popup-button {
-  width: fit-content;
-  height: 30px;
-  background-color: #ececec;
-  font-size: 15px;
-  padding: 0 20px;
-  display: flex;
-  align-items: center;
-  transition: all 0.1s;
-  margin-right: 10px;
-  user-select: none;
-}
-.popup-button:hover {
-  background-color: rgb(220, 220, 220);
-  transition: all 0.1s;
-  cursor: pointer;
-  color: #fff;
-}
-.popup-btn-panel {
-  display: grid;
-  grid-template-columns: repeat(2, 50%);
-  margin-top: 20px;
-}
-.left-group {
-  display: flex;
-  justify-content: flex-start;
-}
-.right-group {
-  display: flex;
-  justify-content: flex-end;
-}
-.right-group > div.popup-button:last-child {
-  margin-right: 0;
-}
-
-.left-group,
-.right-group {
-  display: flex;
-  position: relative;
-}
-
-.popup-button-cancel:hover {
-  background-color: rgb(163, 163, 163);
-}
-.popup-button-clear:hover {
-  background-color: rgb(255, 111, 111);
-}
-.popup-button-submit:hover {
-  background-color: rgb(55, 199, 120);
-}
-.popup-btn-icon {
-  margin-left: 10px;
-}
-
 .selected-pdf > p {
   background-color: #f1f1f1;
   height: 32px;

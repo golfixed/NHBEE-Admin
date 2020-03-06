@@ -1,9 +1,13 @@
 <template>
-  <div class="popup-window">
+  <div class="inner-popup-window">
     <div class="control-tab">
-      <h3 class="window-headtext">
+      <h3 class="tab-title-popup">
         {{ saveId ? 'แก้ไขบทความ' : 'บทความใหม่' }}
-        <i class="fas fa-edit popup-btn-icon"></i>
+        <i
+          class="fas fa-edit popup-btn-icon"
+          v-if="saveId"
+        ></i>
+        <i class="fas fa-plus popup-btn-icon" v-if="!saveId"></i>
       </h3>
     </div>
     <div class="tab-panel">
@@ -45,7 +49,7 @@
       </div>
     </div>
     <hr class="section-hr" style="margin-top: 20px;" />
-    <div class="popup-btn-panel">
+    <div class="popup-btn-panel-2col">
       <div class="left-group">
         <div
           class="popup-button popup-button-cancel"
@@ -210,14 +214,11 @@ export default {
 };
 </script>
 <style scoped>
-.popup-window {
+.inner-popup-window {
   padding: 30px;
   width: 600px;
   max-height: 80vh;
   overflow-y: scroll;
-}
-.section-hr {
-  border: 1px solid #ececec;
 }
 .thai-post-box > input {
   background-color: #f1f1f1;
@@ -250,89 +251,22 @@ export default {
   transform: translate(0, -50%);
 }
 
-.window-headtext {
-  font-size: 25px;
-  padding-bottom: 15px;
-  margin: 0;
-}
 .tab-headtext {
   margin: 20px 0;
 }
-.tab-panel {
-  width: 100%;
-  border: 1px solid grey;
-  border-width: 0 0 1px 0;
-  margin-bottom: 20px;
-}
 .tab-item-active {
-  border-width: 0 0 3px 0;
-  border-color: grey;
+  background-color: #fff !important;
   font-weight: bold;
+  border: 1px solid rgb(100, 100, 100) !important;
+}
+.tab-item-active:hover {
+  transition: all 0.1s;
 }
 .tab-item-inactive {
-  border-width: 0;
+  border: 1px solid #fff !important;
 }
-.tab-item-inactive,
-.tab-item-active {
-  width: fit-content;
-  background-color: transparent;
-  height: 30px;
-  border-radius: 0;
-  font-size: 15px;
-  outline: none;
-  padding: 0 40px;
-}
-.popup-button {
-  width: fit-content;
-  height: 30px;
-  background-color: #ececec;
-  font-size: 15px;
-  padding: 0 20px;
-  display: flex;
-  align-items: center;
+.tab-item-inactive:hover {
+  border: 1px solid rgb(100, 100, 100);
   transition: all 0.1s;
-  margin-right: 10px;
-  user-select: none;
-}
-.popup-button:hover {
-  background-color: rgb(220, 220, 220);
-  transition: all 0.1s;
-  cursor: pointer;
-  color: #fff;
-}
-.popup-btn-panel {
-  display: grid;
-  grid-template-columns: repeat(2, 50%);
-  margin-top: 20px;
-}
-.left-group {
-  display: flex;
-  justify-content: flex-start;
-}
-.right-group {
-  display: flex;
-  justify-content: flex-end;
-}
-.right-group > div.popup-button:last-child {
-  margin-right: 0;
-}
-
-.left-group,
-.right-group {
-  display: flex;
-  position: relative;
-}
-
-.popup-button-cancel:hover {
-  background-color: rgb(163, 163, 163);
-}
-.popup-button-clear:hover {
-  background-color: rgb(255, 111, 111);
-}
-.popup-button-submit:hover {
-  background-color: rgb(55, 199, 120);
-}
-.popup-btn-icon {
-  margin-left: 10px;
 }
 </style>

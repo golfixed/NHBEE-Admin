@@ -1,22 +1,28 @@
 <template>
   <div class="isdesktop">
-    <div
-      style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:20px;"
-    >
+    <div class="toolbar-panel-bg">
       <h1 class="tab-headtext">คลังรูปภาพ และ เอกสารPDF</h1>
-      <div class="top-toolbar">
-        <div class="toolbar-button" @click="loadSurveyList();">
-          <span>รีเฟรชข้อมูล</span>
+      <div class="post-toolbar">
+        <div class="toolbar-button toolbar-button-white" @click="loadSurveyList();">
+          <span>รีเฟรช</span>
           <i class="fas fa-sync toolbar-btn-icon"></i>
         </div>
-        <!-- <div class="toolbar-button" @click="loadSurveyList();" v-if="current_tab == 'image'">
+        <div
+          class="toolbar-button toolbar-button-white"
+          @click="popupToggle('open');"
+          v-if="current_tab == 'image'"
+        >
           <span>อัปโหลดรูปภาพใหม่</span>
           <i class="fas fa-arrow-up toolbar-btn-icon"></i>
         </div>
-        <div class="toolbar-button" @click="loadSurveyList();" v-if="current_tab == 'pdf'">
+        <div
+          class="toolbar-button toolbar-button-white"
+          @click="popupToggle('open');"
+          v-if="current_tab == 'pdf'"
+        >
           <span>อัปโหลดเอกสาร PDF ใหม่</span>
           <i class="fas fa-arrow-up toolbar-btn-icon"></i>
-        </div>-->
+        </div>
       </div>
     </div>
     <div class="tab-panel">
@@ -44,53 +50,12 @@
     <div class="tab-view">
       <div v-if="current_tab === 'image'">
         <div>
-          <div
-            class="upload-text"
-            style="padding-top:20px;background-color: #fff;padding-left: 20px;"
-          >
-            <i class="fas fa-arrow-up" style="margin-right: 10px;"></i>
-            <h5>อัปโหลดรูปภาพใหม่</h5>
-          </div>
-          <div class="lib-toolbar">
-            <div class="upload-panel">
-              <div>
-                <h5>1. เลือกไฟล์</h5>
-                <input
-                  ref="picture_input"
-                  type="file"
-                  @change="fileChange"
-                  accept="image/jpeg, image/png"
-                  :disabled="isUploading"
-                />
-              </div>
-              <div>
-                <h5>2. ตั้งชื่อไฟล์</h5>
-                <input
-                  class="upload-name-file"
-                  type="text"
-                  v-model="filename"
-                  :disabled="isUploading"
-                />
-              </div>
-              <div>
-                <h5>3. อัปโหลด</h5>
-                <button
-                  class="lib-toolbar-button"
-                  :disabled="!file || isUploading"
-                  @click="uploadFile('picture')"
-                >
-                  <span>อัปโหลด</span>
-                  <i class="fas fa-arrow-up" style="margin-left: 10px;"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-          <div class="upload-text" style="background-color: #fff;padding-left: 20px;">
+          <div class="tab-title" style="background-color: #fff;padding-left: 20px;">
             <i class="far fa-images" style="margin-right: 10px;"></i>
             <h5>รูปภาพในคลัง</h5>
           </div>
           <div class="no-result" v-if="imageList.length <= 0">
-            <div class="inner-box">
+            <div class="no-inner-box">
               <div v-if="isLoading == true">
                 <h3>กำลังโหลด</h3>
                 <h4>โปรดรอสักครู่</h4>
@@ -132,53 +97,12 @@
         </div>
       </div>
       <div v-if="current_tab === 'pdf'">
-        <div
-          class="upload-text"
-          style="padding-top:20px;background-color: #fff;padding-left: 20px;"
-        >
-          <i class="fas fa-arrow-up" style="margin-right: 10px;"></i>
-          <h5>อัปโหลดเอกสารใหม่</h5>
-        </div>
-        <div class="lib-toolbar">
-          <div class="upload-panel">
-            <div>
-              <h5>1. เลือกไฟล์</h5>
-              <input
-                ref="pdf_input"
-                type="file"
-                @change="fileChange"
-                accept="application/pdf"
-                :disabled="isUploading"
-              />
-            </div>
-            <div>
-              <h5>2. ตั้งชื่อไฟล์</h5>
-              <input
-                class="upload-name-file"
-                type="text"
-                v-model="filename"
-                :disabled="isUploading"
-              />
-            </div>
-            <div>
-              <h5>3. อัปโหลด</h5>
-              <button
-                class="lib-toolbar-button"
-                :disabled="!file || isUploading"
-                @click="uploadFile('pdf')"
-              >
-                <span>อัปโหลด</span>
-                <i class="fas fa-arrow-up" style="margin-left: 10px;"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-        <div class="upload-text" style="background-color: #fff;padding-left: 20px;">
+        <div class="tab-title" style="background-color: #fff;padding-left: 20px;">
           <i class="fas fa-file-pdf" style="margin-right: 10px;"></i>
           <h5>เอกสารในคลัง</h5>
         </div>
         <div class="no-result" v-if="documentList.length <= 0">
-          <div class="inner-box">
+          <div class="no-inner-box">
             <div v-if="isLoading == true">
               <h3>กำลังโหลด</h3>
               <h4>โปรดรอสักครู่</h4>
@@ -226,7 +150,7 @@
         </div>
       </div>
     </div>
-    <div class="popup-window-mask" v-if="isPopup == true"></div>
+    <div class="popup-window-mask" v-if="isPopup == true" v-on:click="popupToggle('close');"></div>
     <div class="popup-window-container" v-if="isPopup == true">
       <div class="popup-window-box" v-if="isUploading == true">
         <div class="popup-display-area">
@@ -244,6 +168,114 @@
               ตกลง
               <i class="fas fa-check"></i>
             </span>
+          </div>
+        </div>
+      </div>
+      <div class="popup-window-box" v-if="isUploadImage == true">
+        <div class="popup-display-area">
+          <div class="tab-title-popup">
+            <h5>อัปโหลดรูปภาพใหม่</h5>
+            <i class="fas fa-arrow-up" style="margin-left: 10px;"></i>
+          </div>
+          <div class="lib-toolbar">
+            <div class="upload-panel">
+              <div>
+                <h5>1. เลือกไฟล์</h5>
+                <input
+                  ref="picture_input"
+                  type="file"
+                  @change="fileChange"
+                  accept="image/jpeg, image/png"
+                  :disabled="isUploading"
+                />
+              </div>
+              <div>
+                <h5>2. ตั้งชื่อไฟล์</h5>
+                <input
+                  class="upload-name-file"
+                  type="text"
+                  v-model="filename"
+                  :disabled="isUploading"
+                />
+              </div>
+            </div>
+            <hr class="section-hr" style="margin-top: 20px;" />
+            <div class="popup-btn-panel-2col">
+              <div class="left-group">
+                <div
+                  class="popup-button popup-button-cancel"
+                  @click="popupToggle('close');"
+                  :disabled="isLoading"
+                >
+                  <span>ยกเลิก</span>
+                  <i class="fas fa-times popup-btn-icon"></i>
+                </div>
+              </div>
+              <div class="right-group">
+                <div
+                  class="popup-button popup-button-submit"
+                  @click="uploadFile('picture');"
+                  :disabled="isLoading"
+                >
+                  <span>อัปโหลด</span>
+                  <i class="fas fa-arrow-up popup-btn-icon"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="popup-window-box" v-if="isUploadPdf == true">
+        <div class="popup-display-area">
+          <div class="tab-title-popup">
+            <h5>อัปโหลดเอกสารใหม่</h5>
+            <i class="fas fa-arrow-up" style="margin-left: 10px;"></i>
+          </div>
+          <div class="lib-toolbar">
+            <div class="upload-panel">
+              <div>
+                <h5>1. เลือกไฟล์</h5>
+                <input
+                  ref="pdf_input"
+                  type="file"
+                  @change="fileChange"
+                  accept="application/pdf"
+                  :disabled="isUploading"
+                />
+              </div>
+              <div>
+                <h5>2. ตั้งชื่อไฟล์</h5>
+                <input
+                  class="upload-name-file"
+                  type="text"
+                  v-model="filename"
+                  :disabled="isUploading"
+                />
+              </div>
+            </div>
+          </div>
+          <hr class="section-hr" style="margin-top: 20px;" />
+          <div class="popup-btn-panel-2col">
+            <div class="left-group">
+              <div
+                class="popup-button popup-button-cancel"
+                @click="popupToggle('close');"
+                :disabled="isLoading"
+              >
+                <span>ยกเลิก</span>
+                <i class="fas fa-times popup-btn-icon"></i>
+              </div>
+            </div>
+            <div class="right-group">
+              <div
+                class="popup-button popup-button-submit"
+                @click="uploadFile('pdf');"
+                :disabled="isLoading"
+              >
+                <span>อัปโหลด</span>
+                <i class="fas fa-arrow-up popup-btn-icon"></i>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -271,6 +303,8 @@ export default {
       uploadIsOpen: false,
       isLoading: false,
       isPopup: false,
+      isUploadImage: false,
+      isUploadPdf: false,
       isUploadComplete: false
     };
   },
@@ -279,6 +313,28 @@ export default {
     this.$emit(`update:layout`, layout_default);
   },
   methods: {
+    popupToggle(method) {
+      if (this.current_tab == "image") {
+        if (method == "open") {
+          this.isUploadImage = true;
+          this.isPopup = true;
+        } else if (method == "close") {
+          this.isUploadImage = false;
+          this.isPopup = false;
+        } else this.isUploadImage = this.isUploadImage;
+      } else if (this.current_tab == "pdf") {
+        if (method == "open") {
+          this.isUploadPdf = true;
+          this.isPopup = true;
+        } else if (method == "close") {
+          this.isUploadPdf = false;
+          this.isPopup = false;
+        } else this.isUploadPdf = this.isUploadPdf;
+      } else {
+        this.isUploadPdf = this.isUploadPdf;
+        this.isUploadImage = this.isUploadImage;
+      }
+    },
     dismissComplete() {
       this.isUploadComplete = false;
       this.isPopup = false;
@@ -431,6 +487,10 @@ export default {
 </script>
 
 <style scoped>
+.inner-window {
+  padding: 20px;
+  background-color: #fff;
+}
 .popup-button-area {
   width: 100%;
   height: fit-content;
@@ -439,27 +499,11 @@ export default {
   align-items: center;
 }
 .popup-display-area {
-  width: 100%;
   height: calc(100% - 30px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-}
-.popup-button {
-  height: 30px;
-  background-color: #f0f0f0;
-  font-size: 15px;
-  padding: 0 20px;
-  display: flex;
-  align-items: center;
-  transition: all 0.1s;
-  user-select: none;
-  cursor: pointer;
-}
-.popup-button:hover {
-  background-color: #4ead4e;
-  color: #fff;
+  display: block;
+  background-color: #fff;
+  padding: 20px;
+  position: relative;
 }
 .popup-window-mask {
   background: rgba(0, 0, 0, 0.5);
@@ -471,9 +515,7 @@ export default {
   height: 100vh;
 }
 .popup-window-box {
-  width: 300px;
-  height: 150px;
-  padding: 30px;
+  height: fit-content;
   position: absolute;
   background-color: #fff;
   border-radius: 0;
@@ -486,21 +528,8 @@ export default {
   -webkit-box-shadow: 0px 0px 71px 0px rgba(0, 0, 0, 0.3);
   -moz-box-shadow: 0px 0px 71px 0px rgba(0, 0, 0, 0.3);
   box-shadow: 0px 0px 71px 0px rgba(0, 0, 0, 0.3);
-}
-.top-toolbar {
-  display: flex;
-}
-.no-result {
-  color: #aaaaaa;
-  background-color: #fff;
-}
-.no-result > div.inner-box {
-  text-align: center;
-  cursor: default;
-  height: 300px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  border-radius: 10px;
+  overflow: hidden;
 }
 .prev-btn,
 .next-btn {
@@ -543,28 +572,7 @@ export default {
 .pagination-current {
   padding: 0 20px;
 }
-.tab-panel {
-  width: 100%;
-}
-.tab-item-active {
-  background-color: #fff !important;
-  font-weight: bold;
-  border: 0;
-  border-width: 3px 0 0 0;
-}
-.tab-item-inactive {
-  border-width: 0;
-}
-.tab-item-inactive,
-.tab-item-active {
-  width: fit-content;
-  background-color: transparent;
-  height: 40px;
-  border-radius: 0;
-  font-size: 15px;
-  outline: none;
-  padding: 0 40px;
-}
+
 .doc-table-header {
   display: -webkit-box;
   display: -ms-flexbox;
@@ -698,12 +706,7 @@ export default {
   border: 0;
   font-size: 17px;
 }
-.lib-toolbar {
-  display: block;
-  padding: 0 20px 20px 20px;
-  background-color: #fff;
-  position: relative;
-}
+
 .lib-toolbar-button {
   width: -webkit-fit-content;
   width: -moz-fit-content;
@@ -732,19 +735,16 @@ export default {
 .lib-toolbar-btn-icon {
   margin-left: 10px;
 }
-.upload-text {
+.tab-title {
   display: flex;
   align-items: center;
 }
-.upload-text > h5 {
+.tab-title > h5 {
   font-size: 20px;
 }
 .upload-panel {
   display: block;
   position: relative;
-  border: 1px solid #f0f0f0;
-  border-width: 0 0 1px 0;
-  padding: 20px;
 }
 .upload-panel > div {
   display: flex;
@@ -766,30 +766,5 @@ export default {
   background-color: #eaeaea;
   padding-left: 10px;
   outline: none;
-}
-.top-toolbar > div.toolbar-button:last-child {
-  margin-right: 0;
-}
-.toolbar-button {
-  width: fit-content;
-  height: 30px;
-  background-color: #fff;
-  /* border-radius: 5px;
-  border: 1px solid grey; */
-  font-size: 15px;
-  padding: 0 20px;
-  display: flex;
-  align-items: center;
-  transition: all 0.1s;
-  margin-right: 10px;
-}
-
-.toolbar-button:hover {
-  background-color: rgb(220, 220, 220);
-  transition: all 0.1s;
-  cursor: pointer;
-}
-.toolbar-btn-icon {
-  margin-left: 10px;
 }
 </style>

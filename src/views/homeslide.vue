@@ -14,15 +14,19 @@
       </div>
     </div>
     <div class="popup-mask" v-if="isUploadOpen === true" v-on:click="uploadToggle('close');"></div>
-    <div class="newpost-window" v-if="isUploadOpen === true">
-      <div class="upload-text">
-        <i class="fas fa-arrow-up" style="margin-right: 10px;"></i>
+    <div
+      class="popup-window"
+      v-if="isUploadOpen === true"
+      style="display:block !important;padding:20px;"
+    >
+      <div class="tab-title-popup">
         <h5>อัปโหลดรูปภาพใหม่</h5>
+        <i class="fas fa-arrow-up" style="margin-left: 10px;"></i>
       </div>
       <div class="lib-toolbar">
         <div class="upload-panel">
           <div>
-            <h5>1. เลือกไฟล์</h5>
+            <h5>เลือกไฟล์</h5>
             <input
               ref="picture_input"
               type="file"
@@ -31,28 +35,29 @@
               :disabled="isUploading"
             />
           </div>
-          <div>
-            <h5>2. อัปโหลด</h5>
-            <button
-              class="lib-toolbar-button"
-              :disabled="!file || isUploading"
-              @click="uploadFile()"
-            >
-              <span>อัปโหลด</span>
-              <i class="fas fa-arrow-up" style="margin-left: 10px;"></i>
-            </button>
-          </div>
         </div>
       </div>
       <hr class="section-hr" style="margin-top: 20px;" />
-      <div class="popup-btn-panel">
-        <div
-          class="popup-button popup-button-clear"
-          @click="uploadToggle('close');"
-          :disabled="isLoading"
-        >
-          <span>ยกเลิก</span>
-          <i class="fas fa-times popup-btn-icon"></i>
+      <div class="popup-btn-panel-2col">
+        <div class="left-group">
+          <div
+            class="popup-button popup-button-clear"
+            @click="uploadToggle('close');"
+            :disabled="isLoading"
+          >
+            <span>ยกเลิก</span>
+            <i class="fas fa-times popup-btn-icon"></i>
+          </div>
+        </div>
+        <div class="right-group">
+          <div
+            class="popup-button popup-button-submit"
+            @click="uploadFile();"
+            :disabled="isLoading"
+          >
+            <span>อัปโหลด</span>
+            <i class="fas fa-arrow-up popup-btn-icon"></i>
+          </div>
         </div>
       </div>
     </div>
@@ -81,7 +86,7 @@
     <div class="tab-view">
       <div class="homeslide-display" v-if="current_tab == 'lib'">
         <div class="left-panel">
-          <div class="upload-text" style="background-color: #fff;padding: 20px 0 0 20px;">
+          <div class="tab-title" style="background-color: #fff;padding: 20px 0 0 20px;">
             <i class="far fa-images" style="margin-right: 10px;"></i>
             <h5>รูปภาพในคลัง</h5>
           </div>
@@ -122,7 +127,7 @@
           </div>
         </div>
         <div class="right-panel">
-          <div class="upload-text" style="background-color: #fff;padding: 20px 0 0 20px;">
+          <div class="tab-title" style="background-color: #fff;padding: 20px 0 0 20px;">
             <i class="fas fa-check-double" style="margin-right: 10px;"></i>
             <h5>รูปภาพที่เลือก</h5>
           </div>
@@ -130,7 +135,7 @@
             <div class="inner-box">
               <div>
                 <h3>ยังไม่มีรูปภาพที่เลือก</h3>
-                <h4>เริ่มต้นเลือกรูปภาพด้านบน</h4>
+                <h4>เริ่มต้นเลือกรูปภาพด้านซ้ายมือ</h4>
               </div>
             </div>
           </div>
@@ -155,7 +160,7 @@
       <div v-if="current_tab == 'onshow'">
         <div class="onshow-display">
           <div
-            class="upload-text"
+            class="tab-title"
             style="background-color: #fff;padding-top:20px;padding-left: 20px;"
           >
             <i class="far fa-images" style="margin-right: 10px;"></i>
@@ -178,7 +183,7 @@
               </button>
             </div>
           </div>
-          <div class="tab-bottom-toolbar">
+          <div class="tab-bottom-toolbar" v-if="imageList.length > 0">
             <div class="toolbar-button toolbar-button-grey">
               <span>ลบทั้งหมด</span>
               <i class="fas fa-trash-alt toolbar-btn-icon"></i>
@@ -322,10 +327,6 @@ export default {
 </script>
 
 <style scoped>
-.tab-view {
-  border-radius: 10px;
-  overflow: hidden;
-}
 .tab-view > div.homeslide-display {
   display: grid;
   grid-template-columns: 70% 30%;
@@ -340,100 +341,13 @@ export default {
 .left-panel {
   position: relative;
 }
-.section-hr {
-  border: 1px solid #ececec;
-}
-.popup-button {
-  width: fit-content;
-  height: 30px;
-  background-color: #ececec;
-  font-size: 15px;
-  padding: 0 20px;
-  display: flex;
-  align-items: center;
-  transition: all 0.1s;
-  margin-right: 10px;
-  user-select: none;
-  border-radius: 100px;
-}
-.popup-button:hover {
-  background-color: rgb(220, 220, 220);
-  transition: all 0.1s;
-  cursor: pointer;
-  color: #fff;
-}
-.popup-btn-panel {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  margin-top: 20px;
-}
-.left-group {
-  display: flex;
-  justify-content: flex-start;
-}
-.right-group {
-  display: flex;
-  justify-content: flex-end;
-}
-.right-group > div.popup-button:last-child {
-  margin-right: 0;
-}
 
-.left-group,
-.right-group {
-  display: flex;
-  position: relative;
-}
+/* Popup Buttons  */
 
-.popup-button-cancel:hover {
-  background-color: rgb(163, 163, 163);
-}
-.popup-button-clear:hover {
-  background-color: rgb(255, 111, 111);
-}
-.popup-button-submit:hover {
-  background-color: rgb(55, 199, 120);
-}
-.popup-btn-icon {
-  margin-left: 10px;
-}
-
-.popup-mask {
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 5;
-  width: 100vw;
-  height: 100vh;
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-.newpost-window {
-  height: fit-content;
-  position: absolute;
-  background-color: #fff;
-  border-radius: 0;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 6;
-  display: block;
-  -webkit-box-shadow: 0px 0px 71px 0px rgba(0, 0, 0, 0.3);
-  -moz-box-shadow: 0px 0px 71px 0px rgba(0, 0, 0, 0.3);
-  box-shadow: 0px 0px 71px 0px rgba(0, 0, 0, 0.3);
-  border-radius: 20px;
-  overflow: hidden;
-  padding: 30px;
-}
 .post-toolbar {
   display: flex;
 }
-.post-toolbar > div.toolbar-button {
-  margin-right: 15px;
-}
-.post-toolbar > div.toolbar-button:last-child {
-  margin: 0;
-}
+
 .tab-bottom-toolbar {
   display: flex;
   align-items: center;
@@ -462,6 +376,8 @@ export default {
 .no-result > div.inner-box > div {
   text-align: center;
 }
+
+/* Pagination style */
 .prev-btn,
 .next-btn {
   border: 0;
@@ -504,42 +420,9 @@ export default {
 .pagination-current {
   padding: 0 20px;
 }
-.tab-panel {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px 0;
-}
-.tab-item-active {
-  background-color: #fff !important;
-  font-weight: bold;
-  border: 1px solid #fff;
-}
-.tab-item-active:hover {
-  border: 1px solid rgb(100, 100, 100);
-  transition: all 0.1s;
-}
-.tab-item-inactive {
-  border: 1px solid #f0f0f0;
-}
-.tab-item-inactive:hover {
-  border: 1px solid rgb(100, 100, 100);
-  transition: all 0.1s;
-}
-.tab-item-inactive,
-.tab-item-active {
-  width: fit-content;
-  background-color: transparent;
-  height: 40px;
-  font-size: 15px;
-  outline: none;
-  padding: 0 20px;
-  margin: 0 10px;
-  border-radius: 100px;
-  cursor: pointer;
-  transition: all 0.1s;
-}
+
+/* Tab style */
+
 .doc-table-header {
   display: -webkit-box;
   display: -ms-flexbox;
@@ -699,49 +582,6 @@ export default {
   border: 0;
   font-size: 17px;
 }
-.lib-toolbar {
-  display: block;
-  background-color: #fff;
-  position: relative;
-  margin-top: 20px;
-}
-.lib-toolbar-button {
-  width: -webkit-fit-content;
-  width: -moz-fit-content;
-  width: fit-content;
-  height: 30px;
-  background-color: #eaeaea;
-  border-radius: 0;
-  border: 0;
-  font-size: 15px;
-  padding: 0 20px;
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  -webkit-transition: all 0.1s;
-  transition: all 0.1s;
-  border-radius: 100px;
-  outline: none;
-}
-.lib-toolbar-button:hover {
-  background-color: rgb(35, 124, 0);
-  color: #fff;
-  transition: all 0.1s;
-  cursor: pointer;
-}
-.lib-toolbar-btn-icon {
-  margin-left: 10px;
-}
-.upload-text {
-  display: flex;
-  align-items: center;
-}
-.upload-text > h5 {
-  font-size: 20px;
-}
 .upload-panel {
   display: block;
   position: relative;
@@ -767,46 +607,10 @@ export default {
   padding-left: 10px;
   outline: none;
 }
-.toolbar-button {
-  width: fit-content;
-  height: 30px;
 
-  font-size: 15px;
-  padding: 0 20px;
-  display: flex;
-  align-items: center;
-  transition: all 0.1s;
-  border-radius: 100px;
-}
-.toolbar-button:hover {
-  transition: all 0.1s;
-  cursor: pointer;
-}
-.toolbar-btn-icon {
-  margin-left: 10px;
-}
-.toolbar-button-white {
-  background-color: rgb(255, 255, 255);
-  border: 1px solid rgb(255, 255, 255);
-}
-.toolbar-button-white:hover {
-  border: 1px solid rgb(100, 100, 100);
-}
-.toolbar-button-grey {
-  background-color: #e6e6e6;
-  border: 1px solid #e6e6e6;
-}
-.toolbar-button-grey:hover {
-  background-color: #f5f5f5;
-  border: 1px solid rgb(100, 100, 100);
-}
-ิbutton {
-  user-select: none;
-  cursor: pointer;
-  outline: none;
-}
 .onshow-display {
   position: relative;
   padding-bottom: 62px;
+  background-color: #fff;
 }
 </style>
