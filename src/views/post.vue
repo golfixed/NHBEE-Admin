@@ -212,7 +212,7 @@ export default {
       const news = this.dataList[index];
       if (confirm(`ยืนยันการ ${status ? "เผยแพร่" : "ซ่อน"} บทความนี้?`)) {
         axios({
-          method: "patch",
+          method: "post",
           url: `/admin/news/${news.id}/${status ? "" : "un"}publish`
         })
           .then(() => {

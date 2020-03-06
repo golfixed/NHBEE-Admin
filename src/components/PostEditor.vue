@@ -193,7 +193,7 @@ export default {
 
       axios({
         url: `/admin/news${this.saveId ? "/" + this.saveId : ""}`,
-        method: this.saveId ? "put" : "post",
+        method: "post",
         data: sendData
       })
         .then(response => {

@@ -216,8 +216,8 @@ export default {
       if (!this.dataList[index]) return "";
       if (confirm(`ยืนยันการลบงานวิจัยนี้?`)) {
         axios({
-          method: "delete",
-          url: `/admin/research/${this.dataList[index].id}`
+          method: "post",
+          url: `/admin/research/${this.dataList[index].id}/delete`
         })
           .then(() => {
             this.dataList.splice(index, 1);

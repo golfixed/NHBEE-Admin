@@ -449,7 +449,7 @@ export default {
       const image = this.imageList[index];
       if (confirm(`ยืนยันว่าจะลบรูป ${image.filename}?`)) {
         axios
-          .delete(`/admin/picture/${image.id}`)
+          .post(`/admin/picture/${image.id}/delete`)
           .then(response => {
             this.imageList.splice(index, 1);
             this.loadFileList("image", 1);
@@ -465,7 +465,7 @@ export default {
       const pdf = this.documentList[index];
       if (confirm(`ยืนยันว่าจะลบเอกสาร ${pdf.filename}?`)) {
         axios
-          .delete(`/admin/pdf/${pdf.id}`)
+          .post(`/admin/pdf/${pdf.id}/delete`)
           .then(response => {
             this.documentList.splice(index, 1);
             this.loadFileList("pdf", 1);

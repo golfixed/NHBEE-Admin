@@ -238,7 +238,7 @@ export default {
   methods: {
     getAnalyticData() {
       axios
-        .get("http://nhbee.kmutt.ac.th/admin/dashboard/analytic")
+        .get("/admin/dashboard/analytic")
         .then(response => {
           this.analyticData = response.data;
         })

@@ -209,7 +209,8 @@ export default {
         this.admin = data.admin;
       }
     },
-    saveUser(index = -1) {
+    saveUser() {
+      const index = this.userIndex
       this.errorMessage = "";
       let url = "/admin/user";
       const data = {
@@ -224,7 +225,7 @@ export default {
         data.password = this.password;
       }
       axios({
-        method: index >= 0 ? "put" : "post",
+        method: "post",
         url: url,
         data: data
       })
@@ -249,8 +250,8 @@ export default {
     deleteUser(index) {
       if (confirm(`ยืนยันการลบ ${this.userList[index].username} ?`)) {
         axios({
-          method: "delete",
-          url: `/admin/user/${this.userList[index].id}`
+          method: "post",
+          url: `/admin/user/${this.userList[index].id}/delete`
         })
           .then(() => {
             this.userList.splice(index, 1);
