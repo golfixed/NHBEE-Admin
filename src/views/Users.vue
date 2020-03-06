@@ -1,18 +1,16 @@
 
 <template>
   <div class="isdesktop">
-    <div
-      style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:20px;"
-    >
+    <div class="toolbar-panel-bg" style="margin-bottom: 20px;">
       <h1 class="tab-headtext">บัญชีผู้ใช้</h1>
       <div class="post-toolbar">
-        <div class="toolbar-button" @click="newUserToggle('open');">
+        <div class="toolbar-button toolbar-button-white" @click="newUserToggle('open');">
           <span>เพิ่มบัญชีใหม่</span>
           <i class="fas fa-plus toolbar-btn-icon"></i>
         </div>
       </div>
     </div>
-    <div class="users-display">
+    <div class="tab-view">
       <div class="section-text" style="padding-top:20px;background-color: #fff;padding-left: 20px;">
         <i class="fas fa-users" style="margin-right: 10px;"></i>
         <h5>บัญชีผู้ใช้งานทั้งหมด</h5>
@@ -48,86 +46,92 @@
     </div>
     <div class="popup-mask" v-if="isNewOpen === true" v-on:click="newUserToggle('close');"></div>
     <div class="popup-window" v-if="isNewOpen == true">
-      <div v-if="userIndex >= 0" class="edit-account-box">
-        <div class="control-tab">
-          <h3 class="window-headtext">
-            แก้ไขบัญชีผู้ใช้
-            <i class="fas fa-edit popup-btn-icon"></i>
-          </h3>
-          <hr class="section-hr" />
-        </div>
-        <div class="input-item">
-          <h4>ชื่อผู้ใช้งาน</h4>
-          <input type="text" v-model="username" placeholder="ตัวอย่าง: admin" />
-        </div>
-        <div class="input-item">
-          <h4>ชื่อ นามสกุล</h4>
-          <input type="text" v-model="name" placeholder="ตัวอย่าง: Winai Jongpakdee" />
-        </div>
-        <div class="input-item">
-          <h4>รหัสผ่าน</h4>
-          <div class="checkbox">
-            <input type="checkbox" v-model="isPassword" />
-            <label for="checkbox">เปลี่ยนรหัสผ่าน</label>
+      <div style="display: block;padding:20px;">
+        <div v-if="userIndex >= 0" class="edit-account-box">
+          <div class="control-tab">
+            <h3 class="window-headtext">
+              แก้ไขบัญชีผู้ใช้
+              <i class="fas fa-edit popup-btn-icon"></i>
+            </h3>
+            <hr class="section-hr" />
+          </div>
+          <div class="input-item">
+            <h4>ชื่อผู้ใช้งาน</h4>
+            <input type="text" v-model="username" placeholder="ตัวอย่าง: admin" />
+          </div>
+          <div class="input-item">
+            <h4>ชื่อ นามสกุล</h4>
+            <input type="text" v-model="name" placeholder="ตัวอย่าง: Winai Jongpakdee" />
+          </div>
+          <div class="input-item">
+            <h4>รหัสผ่าน</h4>
+            <div class="checkbox">
+              <input type="checkbox" v-model="isPassword" />
+              <label for="checkbox">เปลี่ยนรหัสผ่าน</label>
+            </div>
+          </div>
+          <div v-if="isPassword" class="input-item">
+            <label for="checkbox">รหัสผ่านใหม่</label>
+            <input type="password" v-model="password" placeholder="รหัสผ่านใหม่" />
+          </div>
+          <div class="input-item">
+            <h4>สิทธิ์การใช้งาน</h4>
+            <div class="checkbox">
+              <input type="checkbox" value="true" v-model="admin" />
+              <label for="checkbox">ผู้ดูแลระบบ</label>
+            </div>
           </div>
         </div>
-        <div v-if="isPassword" class="input-item">
-          <label for="checkbox">รหัสผ่านใหม่</label>
-          <input type="password" v-model="password" placeholder="รหัสผ่านใหม่" />
-        </div>
-        <div class="input-item">
-          <h4>สิทธิ์การใช้งาน</h4>
-          <div class="checkbox">
-            <input type="checkbox" value="true" v-model="admin" />
-            <label for="checkbox">ผู้ดูแลระบบ</label>
+        <div v-else-if="userIndex < 0" class="new-account-box">
+          <div class="control-tab">
+            <h3 class="window-headtext">
+              สร้างบัญชีผู้ใช้ใหม่
+              <i class="fas fa-plus popup-btn-icon"></i>
+            </h3>
+            <hr class="section-hr" />
+          </div>
+          <div class="input-item">
+            <h4>ชื่อผู้ใช้งาน</h4>
+            <input type="text" v-model="username" placeholder="ตัวอย่าง: admin" />
+          </div>
+          <div class="input-item">
+            <h4>ชื่อ นามสกุล</h4>
+            <input type="text" v-model="name" placeholder="ตัวอย่าง: Winai Jongpakdee" />
+          </div>
+          <div class="input-item">
+            <h4>รหัสผ่าน</h4>
+            <input type="password" v-model="password" placeholder="รหัสผ่าน" />
+          </div>
+          <div class="input-item">
+            <h4>สิทธิ์การใช้งาน</h4>
+            <div class="checkbox">
+              <input type="checkbox" value="true" v-model="admin" />
+              <label for="checkbox">ผู้ดูแลระบบ</label>
+            </div>
           </div>
         </div>
-      </div>
-      <div v-else-if="userIndex < 0" class="new-account-box">
-        <div class="control-tab">
-          <h3 class="window-headtext">
-            สร้างบัญชีผู้ใช้ใหม่
-            <i class="fas fa-plus popup-btn-icon"></i>
-          </h3>
-          <hr class="section-hr" />
-        </div>
-        <div class="input-item">
-          <h4>ชื่อผู้ใช้งาน</h4>
-          <input type="text" v-model="username" placeholder="ตัวอย่าง: admin" />
-        </div>
-        <div class="input-item">
-          <h4>ชื่อ นามสกุล</h4>
-          <input type="text" v-model="name" placeholder="ตัวอย่าง: Winai Jongpakdee" />
-        </div>
-        <div class="input-item">
-          <h4>รหัสผ่าน</h4>
-          <input type="password" v-model="password" placeholder="รหัสผ่าน" />
-        </div>
-        <div class="input-item">
-          <h4>สิทธิ์การใช้งาน</h4>
-          <div class="checkbox">
-            <input type="checkbox" value="true" v-model="admin" />
-            <label for="checkbox">ผู้ดูแลระบบ</label>
+        <p class="error-msg" v-if="errorMessage">{{ errorMessage }}</p>
+        <hr class="section-hr" style="margin-top: 20px;" />
+        <div class="popup-btn-panel-2col">
+          <div class="left-group">
+            <div
+              class="popup-button popup-button-cancel"
+              @click="newUserToggle('close');"
+              :disabled="isLoading"
+            >
+              <span>ยกเลิก</span>
+              <i class="fas fa-times popup-btn-icon"></i>
+            </div>
           </div>
-        </div>
-      </div>
-      <p class="error-msg" v-if="errorMessage">{{ errorMessage }}</p>
-      <hr class="section-hr" style="margin-top: 20px;" />
-      <div class="popup-btn-panel">
-        <div class="left-group">
-          <div
-            class="popup-button popup-button-cancel"
-            @click="newUserToggle('close');"
-            :disabled="isLoading"
-          >
-            <span>ยกเลิก</span>
-            <i class="fas fa-times popup-btn-icon"></i>
-          </div>
-        </div>
-        <div class="right-group">
-          <div class="popup-button popup-button-submit" @click="saveUser();" :disabled="isLoading">
-            <span>บันทึกข้อมูล</span>
-            <i class="fas fa-save popup-btn-icon"></i>
+          <div class="right-group">
+            <div
+              class="popup-button popup-button-submit"
+              @click="saveUser();"
+              :disabled="isLoading"
+            >
+              <span>บันทึกข้อมูล</span>
+              <i class="fas fa-save popup-btn-icon"></i>
+            </div>
           </div>
         </div>
       </div>
@@ -285,6 +289,7 @@ table > tr > th {
 .edit-account-box {
   background-color: #fff;
   width: 350px;
+  display: block;
 }
 .section-hr {
   border: 1px solid #ececec;
@@ -298,100 +303,6 @@ table > tr > th {
   font-size: 14px;
   margin: 5px 0 20px 0;
   padding-left: 10px;
-}
-.toolbar-button {
-  width: fit-content;
-  height: 30px;
-  background-color: #fff;
-  font-size: 15px;
-  padding: 0 20px;
-  display: flex;
-  align-items: center;
-  transition: all 0.1s;
-}
-.toolbar-button:hover {
-  background-color: rgb(220, 220, 220);
-  transition: all 0.1s;
-  cursor: pointer;
-}
-.toolbar-btn-icon {
-  margin-left: 10px;
-}
-.popup-mask {
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 5;
-  width: 100vw;
-  height: 100vh;
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-.popup-window {
-  padding: 30px;
-  height: fit-content;
-  position: absolute;
-  background-color: #fff;
-  border-radius: 0;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 6;
-  -webkit-box-shadow: 0px 0px 71px 0px rgba(0, 0, 0, 0.3);
-  -moz-box-shadow: 0px 0px 71px 0px rgba(0, 0, 0, 0.3);
-  box-shadow: 0px 0px 71px 0px rgba(0, 0, 0, 0.3);
-}
-.popup-button {
-  width: fit-content;
-  height: 30px;
-  background-color: #ececec;
-  font-size: 15px;
-  padding: 0 20px;
-  display: flex;
-  align-items: center;
-  transition: all 0.1s;
-  margin-right: 10px;
-  user-select: none;
-}
-.popup-button:hover {
-  background-color: rgb(220, 220, 220);
-  transition: all 0.1s;
-  cursor: pointer;
-  color: #fff;
-}
-.popup-btn-panel {
-  display: grid;
-  grid-template-columns: repeat(2, 50%);
-  margin-top: 20px;
-}
-.left-group {
-  display: flex;
-  justify-content: flex-start;
-}
-.right-group {
-  display: flex;
-  justify-content: flex-end;
-}
-.right-group > div.popup-button:last-child {
-  margin-right: 0;
-}
-
-.left-group,
-.right-group {
-  display: flex;
-  position: relative;
-}
-
-.popup-button-cancel:hover {
-  background-color: rgb(163, 163, 163);
-}
-.popup-button-clear:hover {
-  background-color: rgb(255, 111, 111);
-}
-.popup-button-submit:hover {
-  background-color: rgb(55, 199, 120);
-}
-.popup-btn-icon {
-  margin-left: 10px;
 }
 .window-headtext {
   font-size: 25px;

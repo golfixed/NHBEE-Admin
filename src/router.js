@@ -69,19 +69,19 @@ const router = new Router({
   ]
 })
 
-// router.beforeEach((to, from, next) => {
-//   const requiresAuth = to.meta.requiresAuth || false
-//   const requiresAdmin = to.meta.requiresAdmin || false
-//   if (requiresAuth === true) {
-//     if (!store.getters.isLoggedIn) return next('/')
-//   }
-//   if (requiresAdmin === true) {
-//     if (store.getters.payload.admin !== true) return next('/')
-//   }
-//   if (store.getters.isLoggedIn) {
-//     if (!store.getters.checkToken()) return next('/')
-//   }
-//   return next()
-// })
+router.beforeEach((to, from, next) => {
+  const requiresAuth = to.meta.requiresAuth || false
+  const requiresAdmin = to.meta.requiresAdmin || false
+  if (requiresAuth === true) {
+    if (!store.getters.isLoggedIn) return next('/')
+  }
+  if (requiresAdmin === true) {
+    if (store.getters.payload.admin !== true) return next('/')
+  }
+  if (store.getters.isLoggedIn) {
+    if (!store.getters.checkToken()) return next('/')
+  }
+  return next()
+})
 
 export default router
