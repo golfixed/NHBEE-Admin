@@ -43,7 +43,7 @@
           <div
             class="popup-button popup-button-clear"
             @click="uploadToggle('close');"
-            :disabled="isLoading"
+            :disabled="isUploading"
           >
             <span>ยกเลิก</span>
             <i class="fas fa-times popup-btn-icon"></i>
@@ -53,7 +53,7 @@
           <div
             class="popup-button popup-button-submit"
             @click="uploadFile();"
-            :disabled="isLoading"
+            :disabled="isUploading"
           >
             <span>อัปโหลด</span>
             <i class="fas fa-arrow-up popup-btn-icon"></i>
@@ -101,9 +101,9 @@
           <div class="image-show-area" v-if="imageList.length > 0">
             <div class="image-item" v-for="(data, i) in imageList" :key="i">
               <img class="image-item-img" :src="data.url" />
-              <h5 class="image-item-filename">{{data.id}}</h5>
+              <h5 class="image-item-filename">ID: {{data.id}}</h5>
               <button class="image-delete-btn">
-                <i class="fas fa-plus add-btn"></i>
+                <i class="fas fa-plus add-btn" @click="addSelectImage(i)"></i>
                 <i class="fas fa-trash-alt trash-btn" @click="deleteImage(i)"></i>
               </button>
             </div>
@@ -131,7 +131,7 @@
             <i class="fas fa-check-double" style="margin-right: 10px;"></i>
             <h5>รูปภาพที่เลือก</h5>
           </div>
-          <div class="no-result" v-if="imageList.length <= 0">
+          <div class="no-result" v-if="imageSelectList.length <= 0">
             <div class="inner-box">
               <div>
                 <h3>ยังไม่มีรูปภาพที่เลือก</h3>
@@ -140,16 +140,16 @@
             </div>
           </div>
           <div class="select-image-show-area">
-            <div class="image-item" v-for="(data, i) in imageList" :key="i">
+            <div class="image-item" v-for="(data, i) in imageSelectList" :key="i">
               <img class="image-item-img" :src="data.url" />
-              <h5 class="image-item-filename">{{data.id}}</h5>
+              <h5 class="image-item-filename">{{data.order}}</h5>
               <button class="image-delete-btn">
-                <i class="fas fa-trash-alt trash-btn" @click="deleteImage(i)"></i>
+                <i class="fas fa-trash-alt trash-btn" @click="removeSelectImage(data.id)"></i>
               </button>
             </div>
           </div>
           <div class="tab-bottom-toolbar">
-            <div class="toolbar-button toolbar-button-grey">
+            <div class="toolbar-button toolbar-button-grey" @click="saveSelectImage(true)">
               <span>จัดแสดงรายการเลือก</span>
               <i class="fas fa-check-double toolbar-btn-icon"></i>
             </div>
@@ -166,7 +166,7 @@
             <i class="far fa-images" style="margin-right: 10px;"></i>
             <h5>รูปภาพที่แสดงอยู่</h5>
           </div>
-          <div class="no-result" v-if="imageList.length <= 0">
+          <div class="no-result" v-if="imageSelectList.length <= 0">
             <div class="inner-box">
               <div>
                 <h3>ยังไม่มีรูปภาพที่แสดงอยู่</h3>
@@ -174,17 +174,17 @@
               </div>
             </div>
           </div>
-          <div class="image-onshow-area" v-if="imageList.length > 0">
-            <div class="image-item" v-for="(data, i) in imageList" :key="i">
+          <div class="image-onshow-area" v-if="imageSelectList.length > 0">
+            <div class="image-item" v-for="(data, i) in imageSelectList" :key="i">
               <img class="image-item-img" :src="data.url" />
-              <h5 class="image-item-filename">{{data.id}}</h5>
+              <h5 class="image-item-filename">{{data.order}}</h5>
               <button class="image-delete-btn">
-                <i class="fas fa-trash-alt trash-btn" @click="deleteImage(i)"></i>
+                <i class="fas fa-trash-alt trash-btn" @click="removeSelectImage(data.id, true)"></i>
               </button>
             </div>
           </div>
-          <div class="tab-bottom-toolbar" v-if="imageList.length > 0">
-            <div class="toolbar-button toolbar-button-grey">
+          <div class="tab-bottom-toolbar" v-if="imageSelectList.length > 0">
+            <div class="toolbar-button toolbar-button-grey" @click="clearSelectImage()">
               <span>ลบทั้งหมด</span>
               <i class="fas fa-trash-alt toolbar-btn-icon"></i>
             </div>
@@ -253,6 +253,7 @@ export default {
         .then(response => {
           this.page = response.data.page;
           this.imageList = response.data.carousel.data;
+          this.imageSelectList = response.data.order.data;
         })
         .catch(error => {
           if (error.response && error.response.data)
@@ -301,7 +302,7 @@ export default {
       const image = this.imageList[index];
       if (confirm(`ยืนยันว่าจะลบรูป ${image.id}?`)) {
         axios
-          .delete(`/admin/carousel/${image.id}`)
+          .post(`/admin/carousel/${image.id}/delete`)
           .then(response => {
             this.imageList.splice(index, 1);
             this.loadFileList(1);
@@ -321,6 +322,53 @@ export default {
     switchTab: function(target) {
       this.current_tab = target;
       this.loadFileList(1);
+    },
+    addSelectImage (index) {
+      if (!(index >= 0)) return null
+      if (!this.imageList[index]) return null
+      const image = { ...this.imageList[index] }
+      image.order = this.imageSelectList.length + 1
+      let isDup = false
+      for (const i in this.imageSelectList) {
+        const selected = this.imageSelectList[i]
+        if (selected.id === image.id) {
+          isDup = true
+          break
+        }
+      }
+      if (!isDup) this.imageSelectList.push(image)
+    },
+    removeSelectImage (id, save = false) {
+      if (this.imageSelectList <= 0) return null
+      const imageList = this.imageSelectList.filter(a => a.id !== id)
+      if (imageList.length !== this.imageSelectList.length) {
+        for (let i = 0; i < imageList.length; i++) imageList[i].order = (i + 1)
+        this.imageSelectList = imageList.sort((a, b) => a.order - b.order)
+        if (save) this.saveSelectImage()
+      }
+    },
+    clearSelectImage () {
+      if (confirm('ยืนยันที่จะลบทั้งหมด?')) {
+        this.imageSelectList = []
+        this.saveSelectImage()
+      }
+    },
+    saveSelectImage (isButton = false) {
+      const save = []
+      for (const i in this.imageSelectList) save.push(this.imageSelectList[i].id)
+      axios({
+        method: "post",
+        url: "/admin/carousel/save",
+        data: save
+      }).then((response) => {
+        if (isButton) alert('จัดแสดงเรียบร้อย')
+      }).catch((error) => {
+        if (error.response.data) {
+          alert(`รูปภาพที่เลือกไม่ถูกบันทึกเนื่องจาก: ${error.response.data.error}`)
+        } else {
+          alert(`รูปภาพที่เลือกไม่ถูกบันทึกเนื่องจาก: ${error.message}`)
+        }
+      })
     }
   }
 };
