@@ -22,7 +22,7 @@
         <i class="fas fa-search" v-if="search == ''"></i>
         <i class="fas fa-times" v-on:click="clearSearch(); " v-if="search != ''"></i>
       </div>
-      <div class="no-result">
+      <div class="no-result" v-if="dataList.length <= 0">
         <div
           class="no-inner-box"
           v-if="dataList.length <= 0 && isLoading == false && isSearch == true"
