@@ -20,6 +20,17 @@ export default {
 </script>
 
 <style>
+.toolbar-panel-bg {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #e8e8e8;
+  margin: -20px;
+  padding: 20px;
+  border: 1px solid #e6e6e6;
+  border-width: 0 0 1px 0;
+  margin-bottom: 0px;
+}
 .display-area {
   width: calc(100vw - 200px);
   margin-left: 200px;

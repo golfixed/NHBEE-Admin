@@ -1,13 +1,58 @@
 <template>
   <div class="isdesktop">
-    <div
-      style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:20px;"
-    >
-      <h1 class="tab-headtext">Homeslide</h1>
+    <div class="toolbar-panel-bg">
+      <h1 class="tab-headtext">สไลด์รูปภาพ (หน้าแรก)</h1>
       <div class="post-toolbar">
-        <div class="toolbar-button" @click="loadFileList(1);">
-          <span>รีเฟรชข้อมูล</span>
+        <div class="toolbar-button toolbar-button-white" @click="loadFileList(1);">
+          <span>รีเฟรช</span>
           <i class="fas fa-sync toolbar-btn-icon"></i>
+        </div>
+        <div class="toolbar-button toolbar-button-white" @click="uploadToggle('open');">
+          <span>อัปโหลดรูปภาพใหม่</span>
+          <i class="fas fa-arrow-up toolbar-btn-icon"></i>
+        </div>
+      </div>
+    </div>
+    <div class="popup-mask" v-if="isUploadOpen === true" v-on:click="uploadToggle('close');"></div>
+    <div class="newpost-window" v-if="isUploadOpen === true">
+      <div class="upload-text">
+        <i class="fas fa-arrow-up" style="margin-right: 10px;"></i>
+        <h5>อัปโหลดรูปภาพใหม่</h5>
+      </div>
+      <div class="lib-toolbar">
+        <div class="upload-panel">
+          <div>
+            <h5>1. เลือกไฟล์</h5>
+            <input
+              ref="picture_input"
+              type="file"
+              @change="fileChange"
+              accept="image/jpeg, image/png"
+              :disabled="isUploading"
+            />
+          </div>
+          <div>
+            <h5>2. อัปโหลด</h5>
+            <button
+              class="lib-toolbar-button"
+              :disabled="!file || isUploading"
+              @click="uploadFile()"
+            >
+              <span>อัปโหลด</span>
+              <i class="fas fa-arrow-up" style="margin-left: 10px;"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <hr class="section-hr" style="margin-top: 20px;" />
+      <div class="popup-btn-panel">
+        <div
+          class="popup-button popup-button-clear"
+          @click="uploadToggle('close');"
+          :disabled="isLoading"
+        >
+          <span>ยกเลิก</span>
+          <i class="fas fa-times popup-btn-icon"></i>
         </div>
       </div>
     </div>
@@ -34,59 +79,29 @@
       >รูปภาพที่แสดงอยู่</button>
     </div>
     <div class="tab-view">
-      <div v-if="current_tab == 'lib'">
-        <div
-          class="upload-text"
-          style="padding-top:20px;background-color: #fff;padding-left: 20px;"
-        >
-          <i class="fas fa-arrow-up" style="margin-right: 10px;"></i>
-          <h5>อัปโหลดรูปภาพใหม่</h5>
-        </div>
-        <div class="lib-toolbar">
-          <div class="upload-panel">
-            <div>
-              <h5>1. เลือกไฟล์</h5>
-              <input
-                ref="picture_input"
-                type="file"
-                @change="fileChange"
-                accept="image/jpeg, image/png"
-                :disabled="isUploading"
-              />
+      <div class="homeslide-display" v-if="current_tab == 'lib'">
+        <div class="left-panel">
+          <div class="upload-text" style="background-color: #fff;padding: 20px 0 0 20px;">
+            <i class="far fa-images" style="margin-right: 10px;"></i>
+            <h5>รูปภาพในคลัง</h5>
+          </div>
+          <div class="no-result" v-if="imageList.length <= 0">
+            <div class="inner-box">
+              <div>
+                <h3>ยังไม่มีรูปภาพในคลัง</h3>
+                <h4>เริ่มต้นอัปโหลดรูปภาพใหม่ที่เครื่องมืออัปโหลดด้านบน</h4>
+              </div>
             </div>
-            <div>
-              <h5>2. อัปโหลด</h5>
-              <button
-                class="lib-toolbar-button"
-                :disabled="!file || isUploading"
-                @click="uploadFile()"
-              >
-                <span>อัปโหลด</span>
-                <i class="fas fa-arrow-up" style="margin-left: 10px;"></i>
+          </div>
+          <div class="image-show-area" v-if="imageList.length > 0">
+            <div class="image-item" v-for="(data, i) in imageList" :key="i">
+              <img class="image-item-img" :src="data.url" />
+              <h5 class="image-item-filename">{{data.id}}</h5>
+              <button class="image-delete-btn">
+                <i class="fas fa-plus add-btn"></i>
+                <i class="fas fa-trash-alt trash-btn" @click="deleteImage(i)"></i>
               </button>
             </div>
-          </div>
-        </div>
-        <div class="upload-text" style="background-color: #fff;padding-left: 20px;">
-          <i class="far fa-images" style="margin-right: 10px;"></i>
-          <h5>รูปภาพในคลัง</h5>
-        </div>
-        <div class="no-result" v-if="imageList.length <= 0">
-          <div class="inner-box">
-            <div>
-              <h3>ยังไม่มีรูปภาพในคลัง</h3>
-              <h4>เริ่มต้นอัปโหลดรูปภาพใหม่ที่เครื่องมืออัปโหลดด้านบน</h4>
-            </div>
-          </div>
-        </div>
-        <div class="image-show-area" v-if="imageList.length > 0">
-          <div class="image-item" v-for="(data, i) in imageList" :key="i">
-            <img class="image-item-img" :src="data.url" />
-            <h5 class="image-item-filename">{{data.id}}</h5>
-            <button class="image-delete-btn">
-              <i class="fas fa-plus add-btn"></i>
-              <i class="fas fa-trash-alt trash-btn" @click="deleteImage(i)"></i>
-            </button>
           </div>
           <div class="image-pagination">
             <button
@@ -106,31 +121,68 @@
             </button>
           </div>
         </div>
-        <!-- ONLINE GALLERY -->
-      </div>
-      <div v-if="current_tab == 'onshow'">
-        <div
-          class="upload-text"
-          style="background-color: #fff;padding-top:20px;padding-left: 20px;"
-        >
-          <i class="far fa-images" style="margin-right: 10px;"></i>
-          <h5>รูปภาพที่แสดงอยู่</h5>
-        </div>
-        <div class="no-result" v-if="onShowImg.length <= 0">
-          <div class="inner-box">
-            <div>
-              <h3>ยังไม่มีรูปภาพที่แสดงอยู่</h3>
-              <h4>เริ่มต้นเลือกรูปภาพสำหรับจัดแสดงที่แถบ "รูปภาพในคลัง"</h4>
+        <div class="right-panel">
+          <div class="upload-text" style="background-color: #fff;padding: 20px 0 0 20px;">
+            <i class="fas fa-check-double" style="margin-right: 10px;"></i>
+            <h5>รูปภาพที่เลือก</h5>
+          </div>
+          <div class="no-result" v-if="imageList.length <= 0">
+            <div class="inner-box">
+              <div>
+                <h3>ยังไม่มีรูปภาพที่เลือก</h3>
+                <h4>เริ่มต้นเลือกรูปภาพด้านบน</h4>
+              </div>
             </div>
           </div>
+          <div class="select-image-show-area">
+            <div class="image-item" v-for="(data, i) in imageList" :key="i">
+              <img class="image-item-img" :src="data.url" />
+              <h5 class="image-item-filename">{{data.id}}</h5>
+              <button class="image-delete-btn">
+                <i class="fas fa-trash-alt trash-btn" @click="deleteImage(i)"></i>
+              </button>
+            </div>
+          </div>
+          <div class="tab-bottom-toolbar">
+            <div class="toolbar-button toolbar-button-grey">
+              <span>จัดแสดงรายการเลือก</span>
+              <i class="fas fa-check-double toolbar-btn-icon"></i>
+            </div>
+          </div>
+          <!-- ONLINE GALLERY -->
         </div>
-        <div class="image-show-area" v-if="onShowImg.length > 0">
-          <div class="image-item" v-for="(data, i) in onShowImg" :key="i">
-            <img class="image-item-img" :src="data.url" />
-            <h5 class="image-item-filename">{{data.id}}</h5>
-            <button class="image-delete-btn">
-              <i class="fas fa-trash-alt trash-btn" @click="deleteImage(i)"></i>
-            </button>
+      </div>
+      <div v-if="current_tab == 'onshow'">
+        <div class="onshow-display">
+          <div
+            class="upload-text"
+            style="background-color: #fff;padding-top:20px;padding-left: 20px;"
+          >
+            <i class="far fa-images" style="margin-right: 10px;"></i>
+            <h5>รูปภาพที่แสดงอยู่</h5>
+          </div>
+          <div class="no-result" v-if="imageList.length <= 0">
+            <div class="inner-box">
+              <div>
+                <h3>ยังไม่มีรูปภาพที่แสดงอยู่</h3>
+                <h4>เริ่มต้นเลือกรูปภาพสำหรับจัดแสดงที่แถบ "รูปภาพในคลัง"</h4>
+              </div>
+            </div>
+          </div>
+          <div class="image-onshow-area" v-if="imageList.length > 0">
+            <div class="image-item" v-for="(data, i) in imageList" :key="i">
+              <img class="image-item-img" :src="data.url" />
+              <h5 class="image-item-filename">{{data.id}}</h5>
+              <button class="image-delete-btn">
+                <i class="fas fa-trash-alt trash-btn" @click="deleteImage(i)"></i>
+              </button>
+            </div>
+          </div>
+          <div class="tab-bottom-toolbar">
+            <div class="toolbar-button toolbar-button-grey">
+              <span>ลบทั้งหมด</span>
+              <i class="fas fa-trash-alt toolbar-btn-icon"></i>
+            </div>
           </div>
         </div>
       </div>
@@ -155,7 +207,9 @@ export default {
       isUploading: false,
       uploadIsOpen: false,
       onShowImg: [],
-      current_tab: "lib"
+      current_tab: "lib",
+      isUploadOpen: false,
+      imageSelectList: []
     };
   },
   created() {
@@ -163,6 +217,11 @@ export default {
     this.$emit(`update:layout`, layout_default);
   },
   methods: {
+    uploadToggle(method) {
+      if (method == "open") this.isUploadOpen = true;
+      else if (method == "close") this.isUploadOpen = false;
+      else this.isUploadOpen = this.isUploadOpen;
+    },
     refreshList: function() {
       this.loadFileList(1);
     },
@@ -230,6 +289,7 @@ export default {
         })
         .finally(() => {
           this.isUploading = false;
+          this.uploadToggle("close");
         });
     },
     deleteImage(index) {
@@ -262,6 +322,131 @@ export default {
 </script>
 
 <style scoped>
+.tab-view {
+  border-radius: 10px;
+  overflow: hidden;
+}
+.tab-view > div.homeslide-display {
+  display: grid;
+  grid-template-columns: 70% 30%;
+  background-color: #fff;
+  height: calc(100vh - 190px);
+}
+.right-panel {
+  border: 1px solid #ebebeb;
+  border-width: 0 0 0 1px;
+  position: relative;
+}
+.left-panel {
+  position: relative;
+}
+.section-hr {
+  border: 1px solid #ececec;
+}
+.popup-button {
+  width: fit-content;
+  height: 30px;
+  background-color: #ececec;
+  font-size: 15px;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  transition: all 0.1s;
+  margin-right: 10px;
+  user-select: none;
+  border-radius: 100px;
+}
+.popup-button:hover {
+  background-color: rgb(220, 220, 220);
+  transition: all 0.1s;
+  cursor: pointer;
+  color: #fff;
+}
+.popup-btn-panel {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-top: 20px;
+}
+.left-group {
+  display: flex;
+  justify-content: flex-start;
+}
+.right-group {
+  display: flex;
+  justify-content: flex-end;
+}
+.right-group > div.popup-button:last-child {
+  margin-right: 0;
+}
+
+.left-group,
+.right-group {
+  display: flex;
+  position: relative;
+}
+
+.popup-button-cancel:hover {
+  background-color: rgb(163, 163, 163);
+}
+.popup-button-clear:hover {
+  background-color: rgb(255, 111, 111);
+}
+.popup-button-submit:hover {
+  background-color: rgb(55, 199, 120);
+}
+.popup-btn-icon {
+  margin-left: 10px;
+}
+
+.popup-mask {
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 5;
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.newpost-window {
+  height: fit-content;
+  position: absolute;
+  background-color: #fff;
+  border-radius: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 6;
+  display: block;
+  -webkit-box-shadow: 0px 0px 71px 0px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0px 0px 71px 0px rgba(0, 0, 0, 0.3);
+  box-shadow: 0px 0px 71px 0px rgba(0, 0, 0, 0.3);
+  border-radius: 20px;
+  overflow: hidden;
+  padding: 30px;
+}
+.post-toolbar {
+  display: flex;
+}
+.post-toolbar > div.toolbar-button {
+  margin-right: 15px;
+}
+.post-toolbar > div.toolbar-button:last-child {
+  margin: 0;
+}
+.tab-bottom-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+  padding: 20px 0;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+}
+.tab-bottom-toolbar > div.toolbar-button {
+  margin: 0 5px;
+}
 .no-result {
   color: #aaaaaa;
   background-color: #fff;
@@ -308,37 +493,52 @@ export default {
   right: 0;
 }
 .image-pagination {
-  grid-column: span 5;
-  grid-row: 3;
   display: flex;
   justify-content: center;
   align-items: center;
-  position: relative;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 20px 0;
 }
 .pagination-current {
   padding: 0 20px;
 }
 .tab-panel {
   width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 0;
 }
 .tab-item-active {
   background-color: #fff !important;
   font-weight: bold;
-  border: 0;
-  border-width: 3px 0 0 0;
+  border: 1px solid #fff;
+}
+.tab-item-active:hover {
+  border: 1px solid rgb(100, 100, 100);
+  transition: all 0.1s;
 }
 .tab-item-inactive {
-  border-width: 0;
+  border: 1px solid #f0f0f0;
+}
+.tab-item-inactive:hover {
+  border: 1px solid rgb(100, 100, 100);
+  transition: all 0.1s;
 }
 .tab-item-inactive,
 .tab-item-active {
   width: fit-content;
   background-color: transparent;
   height: 40px;
-  border-radius: 0;
   font-size: 15px;
   outline: none;
-  padding: 0 40px;
+  padding: 0 20px;
+  margin: 0 10px;
+  border-radius: 100px;
+  cursor: pointer;
+  transition: all 0.1s;
 }
 .doc-table-header {
   display: -webkit-box;
@@ -359,24 +559,46 @@ export default {
   background-color: #fff;
   border: 0;
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(4, 100px);
+  grid-gap: 20px;
+  padding: 20px;
+}
+.image-onshow-area {
+  background-color: #fff;
+  border: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(2, 100px);
   grid-gap: 20px;
   padding: 20px;
+}
+.select-image-show-area {
+  background-color: #fff;
+  border: 0;
+  display: grid;
+  grid-template-columns: 100%;
+  grid-gap: 20px;
+  padding: 20px;
+  height: calc(100vh - 360px);
+  overflow: scroll;
+  margin-top: 10px;
+}
+.select-image-show-area > div.image-item {
+  width: 100%;
+  height: 150px;
 }
 .image-item {
   position: relative;
   transition: all 0.1s;
   height: 100px;
   overflow: hidden;
+  border-radius: 10px;
 }
 .image-item:hover {
-  transform: scale(1.1);
+  transform: scale(1.05);
   transition: all 0.1s;
   cursor: pointer;
-  -webkit-box-shadow: 0px 2px 5px 1px rgba(0, 0, 0, 0.22);
-  -moz-box-shadow: 0px 2px 5px 1px rgba(0, 0, 0, 0.22);
-  box-shadow: 0px 2px 5px 1px rgba(0, 0, 0, 0.22);
 }
 .image-item-img {
   width: 100%;
@@ -405,6 +627,8 @@ export default {
   -moz-box-shadow: 0px 2px 5px 1px rgba(0, 0, 0, 0.22);
   box-shadow: 0px 2px 5px 1px rgba(0, 0, 0, 0.22);
   border: 0;
+  outline: none;
+  cursor: pointer;
 }
 .trash-btn:hover {
   color: red;
@@ -477,9 +701,9 @@ export default {
 }
 .lib-toolbar {
   display: block;
-  padding: 0 20px 20px 20px;
   background-color: #fff;
   position: relative;
+  margin-top: 20px;
 }
 .lib-toolbar-button {
   width: -webkit-fit-content;
@@ -499,6 +723,8 @@ export default {
   align-items: center;
   -webkit-transition: all 0.1s;
   transition: all 0.1s;
+  border-radius: 100px;
+  outline: none;
 }
 .lib-toolbar-button:hover {
   background-color: rgb(35, 124, 0);
@@ -519,9 +745,6 @@ export default {
 .upload-panel {
   display: block;
   position: relative;
-  border: 1px solid #f0f0f0;
-  border-width: 0 0 1px 0;
-  padding: 20px;
 }
 .upload-panel > div {
   display: flex;
@@ -547,21 +770,43 @@ export default {
 .toolbar-button {
   width: fit-content;
   height: 30px;
-  background-color: #fff;
-  /* border-radius: 5px;
-  border: 1px solid grey; */
+
   font-size: 15px;
   padding: 0 20px;
   display: flex;
   align-items: center;
   transition: all 0.1s;
+  border-radius: 100px;
 }
 .toolbar-button:hover {
-  background-color: rgb(220, 220, 220);
   transition: all 0.1s;
   cursor: pointer;
 }
 .toolbar-btn-icon {
   margin-left: 10px;
+}
+.toolbar-button-white {
+  background-color: rgb(255, 255, 255);
+  border: 1px solid rgb(255, 255, 255);
+}
+.toolbar-button-white:hover {
+  border: 1px solid rgb(100, 100, 100);
+}
+.toolbar-button-grey {
+  background-color: #e6e6e6;
+  border: 1px solid #e6e6e6;
+}
+.toolbar-button-grey:hover {
+  background-color: #f5f5f5;
+  border: 1px solid rgb(100, 100, 100);
+}
+ิbutton {
+  user-select: none;
+  cursor: pointer;
+  outline: none;
+}
+.onshow-display {
+  position: relative;
+  padding-bottom: 62px;
 }
 </style>
