@@ -305,4 +305,56 @@ ul {
   background-color: #fff;
   overflow: hidden;
 }
+.page-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  margin: 20px;
+  background-color: #fff;
+}
+.page-pagination > button {
+  background-color: #e6e6e6;
+  border: 1px solid #e6e6e6;
+  transition: all 0.1s;
+}
+.page-pagination > button:hover {
+  background-color: #ebebeb;
+  border: 1px solid rgb(100, 100, 100);
+}
+.page-pagination > div.pagination-current {
+  padding: 0 20px;
+}
+.prev-btn,
+.next-btn {
+  background-color: #e8e8e8;
+  outline: none;
+  font-size: 15px;
+  cursor: pointer;
+  -webkit-transition: all 0.1s;
+  transition: all 0.1s;
+  border-radius: 100px;
+  height: 32px;
+  width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.prev-btn:hover,
+.next-btn:hover {
+  transition: all 0.1s;
+}
+.prev-btn:focus,
+.next-btn:focus {
+  transition: all 0.1s;
+}
+.prev-btn {
+  position: absolute;
+  left: 0;
+}
+.next-btn {
+  position: absolute;
+  right: 0;
+}
 </style>

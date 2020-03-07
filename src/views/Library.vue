@@ -70,29 +70,32 @@
           </div>
           <div class="image-show-area" v-if="imageList.length > 0">
             <div class="image-item" v-for="(data, i) in imageList" :key="i">
-              <img class="image-item-img" :src="data.pictureURL" />
+              <a target="_blank" :href="data.pictureURL">
+                <img class="image-item-img" :src="data.pictureURL" />
+              </a>
+              <!-- <img class="image-item-img" :src="data.pictureURL" /> -->
               <h5 class="image-item-filename">{{data.filename}}</h5>
               <button class="image-delete-btn" @click="deleteImage(i)">
                 <i class="fas fa-trash-alt"></i>
               </button>
             </div>
-            <div class="image-pagination" v-if="imageList">
-              <button
-                class="pagination-btn prev-btn"
-                v-if="this.page.now != 1"
-                @click="prevPage('image', page.now);"
-              >
-                <i class="fas fa-arrow-left"></i>
-              </button>
-              <div class="pagination-current">{{page.now}} จาก {{page.all}} หน้า</div>
-              <button
-                class="pagination-btn next-btn"
-                v-if="this.page.now != this.page.all"
-                @click="nextPage('image', page.now);"
-              >
-                <i class="fas fa-arrow-right"></i>
-              </button>
-            </div>
+          </div>
+          <div class="page-pagination" v-if="page.all > 0">
+            <button
+              class="pagination-btn prev-btn"
+              v-if="this.page.now != 1"
+              @click="prevPage('image', page.now);"
+            >
+              <i class="fas fa-arrow-left"></i>
+            </button>
+            <div class="pagination-current">{{page.now}} จาก {{page.all}} หน้า</div>
+            <button
+              class="pagination-btn next-btn"
+              v-if="this.page.now != this.page.all"
+              @click="nextPage('image', page.now);"
+            >
+              <i class="fas fa-arrow-right"></i>
+            </button>
           </div>
         </div>
       </div>
@@ -130,7 +133,7 @@
               <i class="fas fa-trash-alt"></i>
             </button>
           </div>
-          <div class="image-pagination" style="margin-top: 20px;">
+          <div class="page-pagination" v-if="page.all > 0" style="margin-top: 20px;">
             <button
               class="pagination-btn prev-btn"
               v-if="this.page.now != 1"
@@ -531,47 +534,6 @@ export default {
   border-radius: 10px;
   overflow: hidden;
 }
-.prev-btn,
-.next-btn {
-  border: 0;
-  background-color: #e8e8e8;
-  border-radius: 0;
-  outline: none;
-  padding: 9px 15px;
-  font-size: 15px;
-  cursor: pointer;
-  transition: all 0.1s;
-}
-
-.prev-btn:hover,
-.next-btn:hover {
-  transform: scale(1.1);
-  transition: all 0.1s;
-}
-.prev-btn:focus,
-.next-btn:focus {
-  transform: scale(1);
-  transition: all 0.1s;
-}
-.prev-btn {
-  position: absolute;
-  left: 0;
-}
-.next-btn {
-  position: absolute;
-  right: 0;
-}
-.image-pagination {
-  grid-column: span 5;
-  grid-row: 3;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-}
-.pagination-current {
-  padding: 0 20px;
-}
 
 .doc-table-header {
   display: -webkit-box;
@@ -594,23 +556,22 @@ export default {
   border: 0;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  grid-template-rows: repeat(2, 100px);
+  grid-template-rows: repeat(2, 160px);
   grid-gap: 20px;
   padding: 20px;
 }
 .image-item {
   position: relative;
   transition: all 0.1s;
-  height: 100px;
+  height: 150px;
   overflow: hidden;
+  border-radius: 10px;
 }
 .image-item:hover {
-  transform: scale(1.1);
+  /* transform: scale(1.1); */
   transition: all 0.1s;
   cursor: pointer;
-  -webkit-box-shadow: 0px 2px 5px 1px rgba(0, 0, 0, 0.22);
-  -moz-box-shadow: 0px 2px 5px 1px rgba(0, 0, 0, 0.22);
-  box-shadow: 0px 2px 5px 1px rgba(0, 0, 0, 0.22);
+  /* border: 1px solid #e6e6e6; */
 }
 .image-item-img {
   width: 100%;

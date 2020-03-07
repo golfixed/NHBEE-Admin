@@ -131,7 +131,7 @@
             <i class="fas fa-check-double" style="margin-right: 10px;"></i>
             <h5>รูปภาพที่เลือก</h5>
           </div>
-          <div class="no-result" v-if="imageSelectList.length <= 0">
+          <div class="no-result" style="height:100%;" v-if="imageSelectList.length <= 0">
             <div class="inner-box">
               <div>
                 <h3>ยังไม่มีรูปภาพที่เลือก</h3>
@@ -148,7 +148,7 @@
               </button>
             </div>
           </div>
-          <div class="tab-bottom-toolbar">
+          <div class="tab-bottom-toolbar" v-if="imageSelectList.length > 0">
             <div class="toolbar-button toolbar-button-grey" @click="saveSelectImage(true)">
               <span>จัดแสดงรายการเลือก</span>
               <i class="fas fa-check-double toolbar-btn-icon"></i>
@@ -323,52 +323,57 @@ export default {
       this.current_tab = target;
       this.loadFileList(1);
     },
-    addSelectImage (index) {
-      if (!(index >= 0)) return null
-      if (!this.imageList[index]) return null
-      const image = { ...this.imageList[index] }
-      image.order = this.imageSelectList.length + 1
-      let isDup = false
+    addSelectImage(index) {
+      if (!(index >= 0)) return null;
+      if (!this.imageList[index]) return null;
+      const image = { ...this.imageList[index] };
+      image.order = this.imageSelectList.length + 1;
+      let isDup = false;
       for (const i in this.imageSelectList) {
-        const selected = this.imageSelectList[i]
+        const selected = this.imageSelectList[i];
         if (selected.id === image.id) {
-          isDup = true
-          break
+          isDup = true;
+          break;
         }
       }
-      if (!isDup) this.imageSelectList.push(image)
+      if (!isDup) this.imageSelectList.push(image);
     },
-    removeSelectImage (id, save = false) {
-      if (this.imageSelectList <= 0) return null
-      const imageList = this.imageSelectList.filter(a => a.id !== id)
+    removeSelectImage(id, save = false) {
+      if (this.imageSelectList <= 0) return null;
+      const imageList = this.imageSelectList.filter(a => a.id !== id);
       if (imageList.length !== this.imageSelectList.length) {
-        for (let i = 0; i < imageList.length; i++) imageList[i].order = (i + 1)
-        this.imageSelectList = imageList.sort((a, b) => a.order - b.order)
-        if (save) this.saveSelectImage()
+        for (let i = 0; i < imageList.length; i++) imageList[i].order = i + 1;
+        this.imageSelectList = imageList.sort((a, b) => a.order - b.order);
+        if (save) this.saveSelectImage();
       }
     },
-    clearSelectImage () {
-      if (confirm('ยืนยันที่จะลบทั้งหมด?')) {
-        this.imageSelectList = []
-        this.saveSelectImage()
+    clearSelectImage() {
+      if (confirm("ยืนยันที่จะลบทั้งหมด?")) {
+        this.imageSelectList = [];
+        this.saveSelectImage();
       }
     },
-    saveSelectImage (isButton = false) {
-      const save = []
-      for (const i in this.imageSelectList) save.push(this.imageSelectList[i].id)
+    saveSelectImage(isButton = false) {
+      const save = [];
+      for (const i in this.imageSelectList)
+        save.push(this.imageSelectList[i].id);
       axios({
         method: "post",
         url: "/admin/carousel/save",
         data: save
-      }).then((response) => {
-        if (isButton) alert('จัดแสดงเรียบร้อย')
-      }).catch((error) => {
-        if (error.response.data) {
-          alert(`รูปภาพที่เลือกไม่ถูกบันทึกเนื่องจาก: ${error.response.data.error}`)
-        } else {
-          alert(`รูปภาพที่เลือกไม่ถูกบันทึกเนื่องจาก: ${error.message}`)
-        }
       })
+        .then(response => {
+          if (isButton) alert("จัดแสดงเรียบร้อย");
+        })
+        .catch(error => {
+          if (error.response.data) {
+            alert(
+              `รูปภาพที่เลือกไม่ถูกบันทึกเนื่องจาก: ${error.response.data.error}`
+            );
+          } else {
+            alert(`รูปภาพที่เลือกไม่ถูกบันทึกเนื่องจาก: ${error.message}`);
+          }
+        });
     }
   }
 };
