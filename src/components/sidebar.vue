@@ -1,7 +1,7 @@
 <template>
   <div class="main-bg display">
     <div class="logo-div">
-      <img src="/logo.png" style="width: 100px;" />
+      <img src="logo.png" style="width: 100px;" />
       <div class="logo-title">
         <p>
           ระบบจัดการ
