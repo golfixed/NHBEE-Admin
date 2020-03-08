@@ -1,11 +1,18 @@
 <template>
   <div v-if="isLoggedIn" class="home-display isdesktop ismobile">
-    <div
-      style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:20px;"
-    >
-      <h1 class="tab-headtext">Dashboard</h1>
+    <div class="toolbar-panel-bg" style="margin-bottom: 20px;">
+      <h1 class="page-headtext">Dashboard</h1>
+      <div class="post-toolbar">
+        <div class="toolbar-button toolbar-button-white" @click="getAnalyticData();">
+          <span>รีเฟรช</span>
+          <i class="fas fa-sync toolbar-btn-icon"></i>
+        </div>
+      </div>
     </div>
-    <div class="highlight-card-display">
+    <div
+      class="highlight-card-display"
+      v-if="analyticData.dimensions.browser.length > 0 && analyticData.dimensions.channelGrouping.length > 0 && analyticData.dimensions.country.length > 0 && analyticData.dimensions.socialNetwork.length > 0"
+    >
       <div class="anlt-card short-card">
         <h3>Session</h3>
         <h1>{{ analyticData.all.sessions || '-' }}</h1>
@@ -99,6 +106,20 @@
         </table>
       </div>
     </div>
+    <div
+      class="no-result no-tab"
+      v-if="analyticData.dimensions.browser.length <= 0 && analyticData.dimensions.channelGrouping.length <= 0 && analyticData.dimensions.country.length <= 0 && analyticData.dimensions.socialNetwork.length <= 0"
+    >
+      <div class="no-inner-box">
+        <div v-if="isLoading == true">
+          <h3>กำลังโหลด</h3>
+          <h4>โปรดรอสักครู่</h4>
+        </div>
+        <div v-if="isLoading == false">
+          <h3>ยังไม่มีข้อมูลตอนนี้</h3>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -112,114 +133,14 @@ export default {
   components: {},
   data() {
     return {
-      analyticData: {
-        all: {
-          sessions: 230,
-          users: 120,
-          newUsers: 100,
-          pageviews: 2000
-        },
-        dimensions: {
-          socialNetwork: [
-            {
-              name: "Facebook",
-              sessions: 6,
-              users: 5,
-              newUsers: 1,
-              pageviews: 3
-            },
-            {
-              name: "LINE",
-              sessions: 6,
-              users: 5,
-              newUsers: 2,
-              pageviews: 9
-            }
-          ],
-          browser: [
-            {
-              name: "Chrome",
-              sessions: 6,
-              users: 5,
-              newUsers: 1,
-              pageviews: 3
-            },
-            {
-              name: "Safari",
-              sessions: 6,
-              users: 5,
-              newUsers: 0,
-              pageviews: 9
-            },
-            {
-              name: "Opera",
-              sessions: 6,
-              users: 5,
-              newUsers: 0,
-              pageviews: 9
-            },
-            {
-              name: "Firefox",
-              sessions: 6,
-              users: 5,
-              newUsers: 0,
-              pageviews: 9
-            }
-          ],
-          country: [
-            {
-              name: "Thailand",
-              sessions: 6,
-              users: 5,
-              newUsers: 1,
-              pageviews: 3
-            },
-            {
-              name: "Singapore",
-              sessions: 6,
-              users: 5,
-              newUsers: 0,
-              pageviews: 9
-            },
-            {
-              name: "Vietnam",
-              sessions: 12,
-              users: 10,
-              newUsers: 3,
-              pageviews: 12
-            }
-          ],
-          channelGrouping: [
-            {
-              name: "Direct",
-              sessions: 6,
-              users: 5,
-              newUsers: 1,
-              pageviews: 3
-            },
-            {
-              name: "Social",
-              sessions: 6,
-              users: 5,
-              newUsers: 0,
-              pageviews: 9
-            },
-            {
-              name: "Organic Search",
-              sessions: 6,
-              users: 5,
-              newUsers: 0,
-              pageviews: 9
-            }
-          ]
-        }
-      }
+      analyticData: {},
+      isLoading: false
     };
   },
   created() {
     if (this.isLoggedIn) {
-      this.$emit(`update:layout`, layout_default);
       this.getAnalyticData();
+      this.$emit(`update:layout`, layout_default);
     } else this.$emit(`update:layout`, layout_login);
   },
   watch: {
@@ -237,10 +158,12 @@ export default {
   },
   methods: {
     getAnalyticData() {
+      this.isLoading = true;
       axios
         .get("/admin/dashboard/analytic")
         .then(response => {
           this.analyticData = response.data;
+          this.isLoading = false;
         })
         .catch(error => {
           if (error.response && error.response.data)
@@ -288,8 +211,8 @@ export default {
 .long-card:hover {
   -webkit-transition: all 0.1s;
   transition: all 0.1s;
-  -webkit-box-shadow: 0px 2px 5px 1px rgba(0, 0, 0, 0.22);
-  box-shadow: 0px 2px 5px 1px rgba(0, 0, 0, 0.22);
+  /* -webkit-box-shadow: 0px 2px 5px 1px rgba(0, 0, 0, 0.22);
+  box-shadow: 0px 2px 5px 1px rgba(0, 0, 0, 0.22); */
   border-radius: 5px;
 }
 

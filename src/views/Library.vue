@@ -1,9 +1,12 @@
 <template>
   <div class="isdesktop">
     <div class="toolbar-panel-bg">
-      <h1 class="tab-headtext">คลังรูปภาพ และ เอกสารPDF</h1>
+      <h1 class="page-headtext">คลังรูปภาพ และ เอกสารPDF</h1>
       <div class="post-toolbar">
-        <div class="toolbar-button toolbar-button-white" @click="loadSurveyList();">
+        <div
+          class="toolbar-button toolbar-button-white"
+          @click="this.loadFileList(current_tab, 1);"
+        >
           <span>รีเฟรช</span>
           <i class="fas fa-sync toolbar-btn-icon"></i>
         </div>
@@ -69,15 +72,17 @@
             </div>
           </div>
           <div class="image-show-area" v-if="imageList.length > 0">
-            <div class="image-item" v-for="(data, i) in imageList" :key="i">
-              <a target="_blank" :href="data.pictureURL">
-                <img class="image-item-img" :src="data.pictureURL" />
-              </a>
-              <!-- <img class="image-item-img" :src="data.pictureURL" /> -->
-              <h5 class="image-item-filename">{{data.filename}}</h5>
-              <button class="image-delete-btn" @click="deleteImage(i)">
-                <i class="fas fa-trash-alt"></i>
-              </button>
+            <div class="image-card" v-for="(data, i) in imageList" :key="i">
+              <div class="image-item">
+                <a target="_blank" :href="data.pictureURL">
+                  <img class="image-item-img" :src="data.pictureURL" />
+                </a>
+                <!-- <img class="image-item-img" :src="data.pictureURL" /> -->
+                <h5 class="image-item-filename">{{data.filename}}</h5>
+                <button class="image-delete-btn" @click="deleteImage(i)">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </div>
             </div>
           </div>
           <div class="page-pagination" v-if="page.all > 0">
@@ -502,7 +507,6 @@ export default {
   align-items: center;
 }
 .popup-display-area {
-  height: calc(100% - 30px);
   display: block;
   background-color: #fff;
   padding: 20px;
@@ -560,11 +564,14 @@ export default {
   grid-gap: 20px;
   padding: 20px;
 }
+.image-card {
+  width: 100%;
+  height: 150px;
+}
 .image-item {
   position: relative;
-  transition: all 0.1s;
-  height: 150px;
   overflow: hidden;
+  height: 150px;
   border-radius: 10px;
 }
 .image-item:hover {
@@ -602,7 +609,7 @@ export default {
   border: 0;
 }
 .image-delete-btn:hover {
-  color: red;
+  color: rgb(255, 75, 75);
   outline: none;
 }
 .image-item:hover > .image-delete-btn {

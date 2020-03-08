@@ -1,7 +1,7 @@
 <template>
   <div class="isdesktop">
     <div class="toolbar-panel-bg" style="margin-bottom: 20px;">
-      <h1 class="tab-headtext">บทความ</h1>
+      <h1 class="page-headtext">บทความ</h1>
       <div class="post-toolbar">
         <div class="toolbar-button toolbar-button-white" @click="ftSearch();">
           <span>รีเฟรช</span>

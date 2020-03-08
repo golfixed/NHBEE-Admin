@@ -27,6 +27,7 @@ export default {
   align-items: center;
   color: #aaaaaa;
   background-color: #fff;
+  user-select: none;
 }
 .no-result > div.no-inner-box {
   text-align: center;
@@ -213,6 +214,7 @@ ul {
 }
 .tab-item-inactive,
 .tab-item-active {
+  color: black;
   width: fit-content;
   background-color: transparent;
   height: 40px;
@@ -283,11 +285,14 @@ ul {
 .popup-btn-icon {
   margin-left: 10px;
 }
-
+.page-headtext {
+  user-select: none;
+}
 .tab-title {
   padding: 20px 0px 0px 20px;
   display: flex;
   align-items: center;
+  user-select: none;
 }
 
 .tab-title-popup {
@@ -303,6 +308,12 @@ ul {
 .tab-view {
   border-radius: 10px;
   background-color: #fff;
+  overflow: hidden;
+  height: calc(100vh - 190px);
+}
+.no-tab {
+  height: calc(100vh - 130px);
+  border-radius: 10px;
   overflow: hidden;
 }
 .page-pagination {

@@ -1,7 +1,7 @@
 <template>
   <div class="isdesktop">
     <div class="toolbar-panel-bg">
-      <h1 class="tab-headtext">ผลแบบสอบถาม</h1>
+      <h1 class="page-headtext">ผลแบบสอบถาม</h1>
       <div class="post-toolbar">
         <div class="toolbar-button toolbar-button-white" @click="loadSurveyList();">
           <span>รีเฟรช</span>

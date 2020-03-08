@@ -2,47 +2,63 @@
 <template>
   <div class="isdesktop">
     <div class="toolbar-panel-bg" style="margin-bottom: 20px;">
-      <h1 class="tab-headtext">บัญชีผู้ใช้</h1>
+      <h1 class="page-headtext">บัญชีผู้ใช้</h1>
       <div class="post-toolbar">
+        <div class="toolbar-button toolbar-button-white" @click="getUser();">
+          <span>รีเฟรช</span>
+          <i class="fas fa-sync toolbar-btn-icon"></i>
+        </div>
         <div class="toolbar-button toolbar-button-white" @click="newUserToggle('open');">
           <span>เพิ่มบัญชีใหม่</span>
           <i class="fas fa-plus toolbar-btn-icon"></i>
         </div>
       </div>
     </div>
-    <div class="tab-view">
-      <div class="section-text" style="padding-top:20px;background-color: #fff;padding-left: 20px;">
+    <div class="tab-view no-tab">
+      <div class="tab-title">
         <i class="fas fa-users" style="margin-right: 10px;"></i>
         <h5>บัญชีผู้ใช้งานทั้งหมด</h5>
       </div>
-      <table>
-        <tr>
-          <th>ID</th>
-          <th>Username</th>
-          <th>Name</th>
-          <th>Admin</th>
-          <th>
-            Options
-            <!-- <button @click="clearUser">Clear Form</button> -->
-          </th>
-        </tr>
-        <tr class="list-item" v-for="(user, i) in userList" :key="'user_' + user.id">
-          <td>{{ user.id }}</td>
-          <td>{{ user.username }}</td>
-          <td>{{ user.name }}</td>
-          <td>
-            <i :class="'fas fa-' + (user.admin ? 'check' : 'times')"></i>
-          </td>
-          <td style="position:relative;">
-            <button class="list-icon-btn list-icon-btn-edit" @click="editUser(i)">
-              <i class="fas fa-edit"></i>
-            </button>
-            <button class="list-icon-btn list-icon-btn-trash" @click="deleteUser(i)">
-              <i class="fas fa-trash"></i>
-            </button>
-          </td>
-        </tr>
-      </table>
+      <div class="no-result no-tab" v-if="userList.length <= 0">
+        <div class="no-inner-box">
+          <div v-if="isLoading == true">
+            <h3>กำลังโหลด</h3>
+            <h4>โปรดรอสักครู่</h4>
+          </div>
+          <div v-if="isLoading == false">
+            <h3>ยังไม่มีข้อมูลตอนนี้</h3>
+          </div>
+        </div>
+      </div>
+      <div class="card-display">
+        <div class="card-container" v-for="(user, i) in userList" :key="'user_' + user.id">
+          <div class="card-box">
+            <div>
+              <i class="fas fa-user-circle"></i>
+              <p class="user-id">ID: {{user.id}}</p>
+              <div class="user-info">
+                <p>ชื่อผู้ใช้</p>
+                <p>{{user.username}}</p>
+              </div>
+              <div class="user-info">
+                <p>ชื่อ</p>
+                <p>{{user.name}}</p>
+              </div>
+              <div class="user-info">
+                <p>ประเภทผู้ใช้</p>
+                <p v-if="user.admin == true">ผู้ดูแลระบบ</p>
+                <p v-if="user.admin == false">ผู้ใช้ทั่วไป</p>
+              </div>
+              <button class="user-edit-btn" @click="editUser(i)">
+                <i class="fas fa-user-edit"></i>
+              </button>
+              <button class="user-del-btn" @click="deleteUser(i)">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="popup-mask" v-if="isNewOpen === true" v-on:click="newUserToggle('close');"></div>
     <div class="popup-window" v-if="isNewOpen == true">
@@ -51,7 +67,7 @@
           <div class="control-tab">
             <h3 class="window-headtext">
               แก้ไขบัญชีผู้ใช้
-              <i class="fas fa-edit popup-btn-icon"></i>
+              <i class="fas fa-user-edit popup-btn-icon"></i>
             </h3>
             <hr class="section-hr" />
           </div>
@@ -210,7 +226,7 @@ export default {
       }
     },
     saveUser() {
-      const index = this.userIndex
+      const index = this.userIndex;
       this.errorMessage = "";
       let url = "/admin/user";
       const data = {
@@ -240,6 +256,7 @@ export default {
             this.userList.push(data);
           }
           this.clearUser();
+          this.newUserToggle("close");
         })
         .catch(error => {
           if (error.response && error.response.data)
@@ -255,6 +272,7 @@ export default {
         })
           .then(() => {
             this.userList.splice(index, 1);
+            this.newUserToggle("close");
           })
           .catch(error => {
             if (error.response && error.response.data)
@@ -268,6 +286,101 @@ export default {
 </script>
 
 <style scoped>
+.card-display {
+  padding: 20px;
+  display: flex;
+  /* height: calc(100vh - 190px); */
+  overflow: scroll;
+  flex-wrap: wrap;
+}
+.card-container {
+  width: 200px;
+  margin-right: 20px;
+  margin-bottom: 20px;
+}
+.card-display > .card-container:last-child {
+  margin-right: 0;
+}
+.card-box {
+  background-color: #f1f1f1;
+  border-radius: 10px;
+  width: 100%;
+  border: 1px solid #f1f1f1;
+  transition: all 0.1s;
+}
+.card-box:hover {
+  border: 1px solid rgb(100, 100, 100);
+  transition: all 0.1s;
+}
+.card-box > div {
+  padding: 10px;
+  position: relative;
+}
+.card-box > div > i {
+  font-size: 30px;
+  color: #808080;
+  width: 100%;
+  margin-bottom: 20px;
+}
+.card-box > div > p.user-id {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: #808080;
+}
+
+.user-info {
+  padding-bottom: 10px;
+}
+.user-info > p:first-child {
+  font-size: 12px;
+  color: #808080;
+}
+.user-info > p:last-child {
+  font-size: 16px;
+}
+
+.user-del-btn,
+.user-edit-btn {
+  border-radius: 10000px;
+  width: 35px;
+  height: 35px;
+  background-color: #fff;
+  position: absolute;
+  display: none;
+  font-size: 16px;
+  -webkit-box-shadow: 0px 0px 1px 0px rgba(0, 0, 0, 0.22);
+  -moz-box-shadow: 0px 0px 1px 0px rgba(0, 0, 0, 0.22);
+  box-shadow: 0px 0px 1px 0px rgba(0, 0, 0, 0.22);
+  border: 0;
+  user-select: none;
+  outline: none;
+}
+
+.card-container:hover > div.card-box > div > button.user-edit-btn,
+.card-container:hover > div.card-box > div > button.user-del-btn {
+  display: block;
+}
+
+.user-del-btn {
+  right: 10px;
+  bottom: 10px;
+}
+.user-del-btn:hover {
+  background-color: rgb(255, 75, 75);
+  color: #fff;
+  transition: all 0.1s;
+}
+.user-edit-btn {
+  right: 10px;
+  bottom: 55px;
+}
+.user-edit-btn:hover {
+  background-color: rgb(100, 100, 100);
+  color: #fff;
+  transition: all 0.1s;
+}
+
 table {
   width: 100%;
   padding: 20px;

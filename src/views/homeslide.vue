@@ -1,7 +1,7 @@
 <template>
   <div class="isdesktop">
     <div class="toolbar-panel-bg">
-      <h1 class="tab-headtext">สไลด์รูปภาพ (หน้าแรก)</h1>
+      <h1 class="page-headtext">สไลด์รูปภาพ (หน้าแรก)</h1>
       <div class="post-toolbar">
         <div class="toolbar-button toolbar-button-white" @click="loadFileList(1);">
           <span>รีเฟรช</span>
@@ -364,6 +364,7 @@ export default {
       })
         .then(response => {
           if (isButton) alert("จัดแสดงเรียบร้อย");
+          this.imageSelectList = [];
         })
         .catch(error => {
           if (error.response.data) {
@@ -551,7 +552,6 @@ export default {
 }
 .image-delete-btn {
   border-radius: 10000px;
-  width: fit-content;
   height: 35px;
   background-color: #fff;
   position: absolute;
