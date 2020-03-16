@@ -63,7 +63,7 @@
               <h5 class="doc-item-filename">{{data.name}}</h5>
               <h5 class="doc-item-farmname">{{data.farmname}}</h5>
               <h5 class="doc-item-date">{{data.timestamp}}</h5>
-              <button class="doc-delete-btn" @click="deletePdf(i)">
+              <button class="list-btn list-btn-red" @click="deletePdf(i)">
                 <i class="fas fa-trash-alt"></i>
               </button>
             </div>
@@ -118,7 +118,7 @@
               <h5 class="doc-item-filename">{{data.name}}</h5>
               <h5 class="doc-item-farmname">{{data.country}}</h5>
               <h5 class="doc-item-date">{{data.timestamp}}</h5>
-              <button class="doc-delete-btn" @click="deletePdf(i)">
+              <button class="list-btn list-btn-red" @click="deletePdf(i)">
                 <i class="fas fa-trash-alt"></i>
               </button>
             </div>
@@ -398,9 +398,9 @@ export default {
 .doc-item:hover {
   transition: all 0.1s;
   cursor: pointer;
-  -webkit-box-shadow: 0px 2px 5px 1px rgba(0, 0, 0, 0.22);
+  /* -webkit-box-shadow: 0px 2px 5px 1px rgba(0, 0, 0, 0.22);
   -moz-box-shadow: 0px 2px 5px 1px rgba(0, 0, 0, 0.22);
-  box-shadow: 0px 2px 5px 1px rgba(0, 0, 0, 0.22);
+  box-shadow: 0px 2px 5px 1px rgba(0, 0, 0, 0.22); */
   border-radius: 5px;
 }
 .doc-item-icon {
@@ -417,23 +417,5 @@ export default {
 }
 .doc-item-date {
   width: fit-content;
-}
-.doc-delete-btn {
-  position: absolute;
-  right: 0;
-  display: none;
-  transition: all 0.1s;
-  outline: none;
-}
-.doc-delete-btn:hover {
-  color: red;
-  transition: all 0.1s;
-  transform: scale(1.1);
-}
-.doc-item:hover > .doc-delete-btn {
-  display: block;
-  margin-right: 20px;
-  border: 0;
-  font-size: 17px;
 }
 </style>

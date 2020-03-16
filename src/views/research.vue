@@ -73,12 +73,12 @@
                 <div class="research-list-title">{{ research.th.title }} ({{ research.en.title }})</div>
               </td>
               <td style="text-align:center;align-items:center;">
-                <button @click="editResearch(research.id)">
+                <button @click="editResearch(research.id)" class="list-btn">
                   <i class="fas fa-edit" />
                 </button>
               </td>
               <td style="text-align:center;align-items:center;">
-                <button @click="deleteResearch(index)">
+                <button @click="deleteResearch(index)" class="list-btn list-btn-red">
                   <i class="fas fa-trash" />
                 </button>
               </td>
@@ -260,14 +260,7 @@ export default {
   transition: all 0.1s;
   height: 40px;
 }
-.research-list:hover {
-  -webkit-transition: all 0.1s;
-  transition: all 0.1s;
-  cursor: pointer;
-  -webkit-box-shadow: 0px 2px 5px 1px rgba(0, 0, 0, 0.22);
-  box-shadow: 0px 2px 5px 1px rgba(0, 0, 0, 0.22);
-  border-radius: 5px;
-}
+
 .prev-btn,
 .next-btn {
   border: 0;

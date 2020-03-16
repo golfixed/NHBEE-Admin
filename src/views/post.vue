@@ -68,13 +68,13 @@
                 <div class="news-list-title">{{ news.title_th }} ({{ news.title_en }})</div>
               </td>
               <td style="justify-content:center;align-items:center;">
-                <button @click="editPost(news.id)">
+                <button @click="editPost(news.id)" class="list-btn">
                   <i class="fas fa-edit" />
                 </button>
               </td>
               <td>
-                <button @click="publish(index, !news.status)">
-                  <i :class="`fas fa-globe globe-${(news.status ? '' : 'un')}publish`" />
+                <button @click="publish(index, !news.status)" class="list-btn">
+                  <i :class="`fas fa-globe globe-${(news.status ? '' : 'un')}publish ` " />
                 </button>
               </td>
             </tr>

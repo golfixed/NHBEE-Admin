@@ -368,4 +368,26 @@ ul {
   position: absolute;
   right: 0;
 }
+.list-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 30px;
+  background-color: #ebebeb;
+  border-radius: 100px;
+  border: 0;
+  font-size: 14px;
+  user-select: none;
+  cursor: pointer;
+  outline: none;
+}
+.list-btn:hover {
+  border: 1px solid #646464;
+}
+.list-btn-red:hover {
+  border: 1px solid rgb(255, 31, 31);
+  background-color: rgb(255, 75, 75);
+  color: #fff;
+}
 </style>
